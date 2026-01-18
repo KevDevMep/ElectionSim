@@ -3,10 +3,38 @@ import random as r
 import matplotlib.pyplot as plt
 # Meant for a unformated CSV
 
+def shifter(dict, shift_amount, group = ""):
+    demA, demB, totalA, totalB = 0, 0, 0, 0
+    for d in dict:
+        totalA += dict[d]['Expected']
+        if dict[d]['Margin'] > 0:
+            demA += 1
+        ajusted = shift_amount
+        match group:
+            case 'White':
+                ajusted *= dict[d]['WhitePct']
+            case 'Black':
+                ajusted *= dict[d]['BlackPct']
+            case 'Hispanic':
+                ajusted *= dict[d]['HispanicPct']
+            case 'Asian':
+                ajusted *= dict[d]['AsianPct']
+            case 'Native':
+                ajusted *= dict[d]['NativePct']
+            case _:
+                ajusted *= 1
+        dict[d]['Margin'] += ajusted
+        dict[d]['Expected'] = expected(dict[d]['Margin'])
+        totalB += dict[d]['Expected']
+        if dict[d]['Margin'] > 0:
+            demB += 1
+    print(f"Before Shift: (D: {demA}, R: {len(dict) - demA}, E: {totalA:.2f})")
+    print(f"After Shift: (D: {demB},R: {len(dict) - demB}, E: {totalB:.2f}) with {demB - demA} flipped seats")
+
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
-type = input("0 for Simulator, 1 for Shifter, 2 for Tipping Point: ")
 filename = input("Filename (csv file only): ")
+type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder: ")
 data = {}
 expected = lambda n: min(max((1 + 10* n) / 2, 0), 1)
 
@@ -15,7 +43,7 @@ with open(filename, newline='') as csvfile:
     i = 0
     for row in districtreader:
         d_expected = expected(float(row['Margin']))
-        data[i] = {"Margin": float(row['Margin']), "Expected": d_expected}
+        data[i] = {"Margin": float(row['Margin']), "Expected": d_expected, "WhitePct": float(row['WhitePct']), "BlackPct": float(row['BlackPct']), "HispanicPct": float(row['HispanicPct']), "AsianPct": float(row['AsianPct']), "NativePct": float(row['NativePct'])}
         i += 1
 
 while True:
@@ -48,24 +76,18 @@ while True:
                 plt.show()
                 type = input("Again? ")
         case "1":
-            demA, demB, totalA, totalB = 0, 0, 0, 0
-            shift = float(input("Shift Amount (As Decmial): "))
-            for d in data:
-                totalA += data[d]['Expected']
-                if data[d]['Margin'] > 0:
-                    demA += 1
-                data[d]['Margin'] += shift
-                data[d]['Expected'] = expected(data[d]['Margin'])
-                totalB += data[d]['Expected']
-                if data[d]['Margin'] > 0:
-                    demB += 1
-            print(f"Before Shift: (D: {demA}, R: {len(data) - demA}, E: {totalA:.2f})")
-            print(f"After Shift: (D: {demB},R: {len(data) - demB}, E: {totalB:.2f}) with {demB - demA} flipped seats")
+            shift_amount = float(input("Shift Amount (As Decmial): "))
+            shifter(data, shift_amount)
             type = input("Again? ")
         case "2":
             sd = sorted(data.values(), key=lambda n: n['Margin'])
             half = len(data) // 2
             print(f'Tipping Point Seat Margin: {sd[half]['Margin']:.2%}')
+            type = input("Again? ")
+        case "3":
+            group = input("Racial Group (White, Black, Hispanic, Asian, Native): ")
+            shift_amount = float(input("Shift Amount (As Decmial): "))
+            shifter(data, shift_amount, group)
             type = input("Again? ")
         case _:
             print("End")
