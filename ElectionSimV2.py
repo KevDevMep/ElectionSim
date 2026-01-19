@@ -43,7 +43,7 @@ with open(filename, newline='') as csvfile:
     i = 0
     for row in districtreader:
         d_expected = expected(float(row['Margin']))
-        data[i] = {"Margin": float(row['Margin']), "Expected": d_expected, "WhitePct": float(row['WhitePct']), "BlackPct": float(row['BlackPct']), "HispanicPct": float(row['HispanicPct']), "AsianPct": float(row['AsianPct']), "NativePct": float(row['NativePct'])}
+        data[i] = {"Margin": float(row['Margin']), "Expected": d_expected, "MinorityPct": float(row['MinorityPct']), "WhitePct": float(row['WhitePct']), "BlackPct": float(row['BlackPct']), "HispanicPct": float(row['HispanicPct']), "AsianPct": float(row['AsianPct']), "NativePct": float(row['NativePct'])}
         i += 1
 
 while True:
@@ -60,15 +60,13 @@ while True:
                         if n < data[d]['Expected']:
                             total += 1
                             trail_total += 1
-                    results[str(trail_total)] = results.get(str(trail_total), 0) + 1
+                    results[trail_total] = results.get(trail_total, 0) + 1
                     # print(f"{i + 1}th trail: (D: {trail_total}, R: {len(data) - trail_total})")
                     if trail_total > (len(data) - trail_total):
                         wins += 1
                 print(f'average: {total / trails}, wins: (D: {wins}, R: {trails - wins})')
-                sorted_keys = sorted(results)
-                sorted_vals = [results[k] for k in sorted_keys]
-                plt.figure(figsize=(14, 10))
-                plt.scatter(sorted_keys, sorted_vals)
+                plt.figure(figsize=(16, 10))
+                plt.scatter(results.keys(), results.values())
                 plt.xlabel('Number of D Seats')
                 plt.ylabel('Trails')
                 plt.title('Simulator Results')
