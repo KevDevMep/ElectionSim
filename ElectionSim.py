@@ -2,60 +2,86 @@ import csv
 import random as r
 import matplotlib.pyplot as plt
 
+expected = lambda n: min(max((1 + 10 * n) / 2.0, 0.0), 1.0)
+
 def shifter(data, shift_amount, group = ""):
     demA, demB, totalA, totalB = 0, 0, 0, 0
     for d in data:
-        totalA += data[d]['Expected']
-        if data[d]['Margin'] > 0:
+        totalA += d.Expected
+        if d.Margin > 0:
             demA += 1
-        ajusted = shift_amount
-        match group:
-            case 'W':
-                ajusted *= data[d]['WhitePct']
-            case 'B':
-                ajusted *= data[d]['BlackPct']
-            case 'H':
-                ajusted *= data[d]['HispanicPct']
-            case 'P':
-                ajusted *= data[d]['PacificPct']
-            case 'A':
-                ajusted *= data[d]['AsianPct']
-            case 'N':
-                ajusted *= data[d]['NativePct']
-            case _:
-                ajusted *= 1
-        if ajusted > 0:
-            if data[d]['Margin'] < 0 and -data[d]['Margin'] < ajusted:
-                data[d]['Flipped'] = True
-        elif ajusted < 0:
-            if data[d]['Margin'] > 0 and -data[d]['Margin'] > ajusted:
-                data[d]['Flipped'] = True
-        data[d]['Margin'] += ajusted
-        data[d]['Expected'] = expected(data[d]['Margin'])
-        totalB += data[d]['Expected']
-        if data[d]['Margin'] > 0:
+        d.shift(shift_amount, group)
+        totalB += d.Expected
+        if d.Margin > 0:
             demB += 1
     print(f"Before Shift: (D: {demA}, R: {len(data) - demA}, E: {totalA:.2f})")
     print(f"After Shift: (D: {demB},R: {len(data) - demB}, E: {totalB:.2f}) with {demB - demA} flipped seats")
     for d in data:
-        if data[d]['Flipped']:
-            print(f"{d}: {data[d]['Margin']:.2%}")
-            data[d]['Flipped'] = False
+        if d.Flipped:
+            d.to_string()
+            d.flip()
+
+class district:
+    def __init__(self, cd, margin, expected, whitePct, minorityPct, blackPct, hispanicPct, pacificPct, asianPct, nativePct):
+        self.CD = cd
+        self.Margin = margin
+        self.Expected = expected
+        self.Flipped = False
+        self.WhitePct = whitePct
+        self.MinorityPct = minorityPct
+        self.BlackPct = blackPct
+        self.HispanicPct = hispanicPct
+        self.PacificPct = pacificPct
+        self.AsianPct = asianPct
+        self.NativePct = nativePct
+
+    def to_string(self):
+        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}')
+
+    def shift(self, shift_amount, group = ""):
+        if shift_amount != 0:
+            ajusted = shift_amount
+            match group:
+                case 'W':
+                    ajusted *= self.WhitePct
+                case 'B':
+                    ajusted *= self.BlackPct
+                case 'H':
+                    ajusted *= self.HispanicPct
+                case 'P':
+                    ajusted *= self.PacificPct
+                case 'A':
+                    ajusted *= self.AsianPct
+                case 'N':
+                    ajusted *= self.NativePct
+                case _:
+                    ajusted *= 1
+            if ajusted > 0:
+                if self.Margin < 0 and -self.Margin < ajusted:
+                    self.Flipped = True
+            else:
+                if self.Margin > 0 and -self.Margin > ajusted:
+                    self.Flipped = True
+            self.Margin = max(min((self.Margin + ajusted), 1), -1)
+            self.Expected = expected(self.Margin)
+
+    def flip(self):
+        self.Flipped = not self.Flipped
 
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
 print("This version is for labeled data")
-
 filename = input("Filename (csv file only): ")
 dataset = input("dataset (24_Pres, 20_Pres, 20-24_Pres): ")
-expected = lambda n: min(max((1 + 10* n) / 2, 0), 1)
-data = {}
+
+data = []
 with open(filename, newline='') as csvfile:
     districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
     for row in districtreader:
         cd = f"{row['State']}-{row['Id']}"
         d_expected = expected(float(row[dataset]))
-        data[cd] = {"Margin": float(row[dataset]), "Expected": float(d_expected), "Flipped": False, "WhitePct": float(row['WhitePct']), "MinorityPct": float(row['MinorityPct']), "BlackPct": float(row['BlackPct']), "HispanicPct": float(row['HispanicPct']), "PacificPct":float(row['PacificPct']), "AsianPct": float(row['AsianPct']), "NativePct": float(row['NativePct'])}
+        d = district(cd, float(row[dataset]), float(d_expected), float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+        data.append(d)
 
 seats = len(data)
 type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder: ")
@@ -73,7 +99,7 @@ while True:
                         trail_total = 0
                         for d in data:
                             n = r.random()
-                            if n < data[d]['Expected']:
+                            if n < d.Expected:
                                 total += 1
                                 trail_total += 1
                         results[trail_total] = results.get(trail_total, 0) + 1
@@ -94,9 +120,9 @@ while True:
             shifter(data, shift_amount)
             type = input("Again? ")
         case "2":
-            sd = sorted(data.values(), key=lambda n: n['Margin'])
+            sd = sorted(data, key=lambda n: n.Margin)
             half = seats // 2
-            print(f'Tipping Point Seat Margin: {sd[half]['Margin']:.2%}')
+            sd[half].to_string()
             type = input("Again? ")
         case "3":
             group = input("Racial Group (W: White, B: Black,H: Hispanic, P: Pacific, A: Asian, N: Native): ")
