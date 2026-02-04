@@ -2,7 +2,7 @@ import csv
 import random as r
 import matplotlib.pyplot as plt
 
-expected = lambda n: min(max((1 + 10 * n) / 2.0, 0.0), 1.0)
+expected = lambda n: min(max((1 + (1 / safe_point) * n) / 2.0, 0.0), 1.0)
 
 def shifter(data, shift_amount, group = ""):
     demA, demB, totalA, totalB = 0, 0, 0, 0
@@ -68,11 +68,45 @@ class district:
     def flip(self):
         self.Flipped = not self.Flipped
 
+def stats(data):
+    d_stats = {}
+    total = 0
+    for d in data:
+        total += d.Expected
+        if d.Margin > safe_point:
+            d_stats['D_Safe'] = d_stats.get('D_Safe', 0) + 1
+        elif d.Margin > 0:
+            d_stats['D_Comp'] = d_stats.get('D_Comp', 0) + 1
+        elif d.Margin < -safe_point:
+            d_stats['R_Safe'] = d_stats.get('R_Safe', 0) + 1
+        else:
+            d_stats['R_Comp'] = d_stats.get('R_Comp', 0) + 1
+        
+        if d.WhitePct > .5:
+            d_stats['White'] = d_stats.get('White', 0) + 1
+        elif d.BlackPct > .5:
+            d_stats['Black'] = d_stats.get('Black', 0) + 1
+        elif d.HispanicPct > .5:
+            d_stats['Hispanic'] = d_stats.get('Hispanic', 0) + 1
+        elif d.AsianPct > .5:
+            d_stats['Asian'] = d_stats.get('Asian', 0) + 1
+        elif d.NativePct > .5:
+            d_stats['Native'] = d_stats.get('Native', 0) + 1
+        elif d.PacificPct > .5:
+            d_stats['Pacific'] = d_stats.get('Pacific', 0) + 1
+        else:
+            d_stats['Minority'] = d_stats.get('Minority', 0) + 1
+
+    print(f"Expected: {total}")
+    print(f"D_Safe: {d_stats['D_Safe']}, D_Comp: {d_stats['D_Comp']}, R_Comp: {d_stats['R_Comp']}, R_Safe: {d_stats['R_Safe']}")
+    print(f"White: {d_stats['White']}, Black: {d_stats['Black']}, Hispanic: {d_stats['Hispanic']}, Asian: {d_stats['Asian']}, Minority: {d_stats['Minority']}")
+
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
 print("This version is for labeled data")
 filename = input("Filename (csv file only): ")
 dataset = input("dataset (24_Pres, 20_Pres, 20-24_Pres): ")
+safe_point = float(input("Safe Point (Decmial): "))
 
 data = []
 with open(filename, newline='') as csvfile:
@@ -84,7 +118,7 @@ with open(filename, newline='') as csvfile:
         data.append(d)
 
 seats = len(data)
-type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder: ")
+type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats: ")
 while True:
     match type:
         case "0":
@@ -128,6 +162,9 @@ while True:
             group = input("Racial Group (W: White, B: Black,H: Hispanic, P: Pacific, A: Asian, N: Native): ")
             shift_amount = float(input("Shift Amount (As Decmial): "))
             shifter(data, shift_amount, group)
+            type = input("Again? ")
+        case "4":
+            stats(data)
             type = input("Again? ")
         case _:
             print("End")
