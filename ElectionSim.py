@@ -104,9 +104,19 @@ def stats(data):
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
 print("This version is for labeled data")
-filename = input("Filename (csv file only): ")
-dataset = input("dataset (24_Pres, 20_Pres, 20-24_Pres): ")
-safe_point = float(input("Safe Point (Decmial): "))
+
+preload = input("Preload (Y/N)? ")
+
+if preload == 'Y':
+    settings = input("Settings File (txt file): ")
+    with open(settings, 'r', encoding="utf-8") as f:
+        filename = f.readline().strip()
+        safe_point = float(f.readline().strip())
+        dataset = f.readline().strip()
+else:
+    filename = input("Filename (csv file only): ")
+    dataset = input("dataset (24_Pres, 20_Pres, 20-24_Pres): ")
+    safe_point = float(input("Safe Point (Decmial): "))
 
 data = []
 with open(filename, newline='') as csvfile:

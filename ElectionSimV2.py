@@ -106,8 +106,18 @@ print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
 print("This version is for unlabeled data")
 
-filename = input("Filename (csv file only): ")
-safe_point = float(input("Safe Point (Decmial): "))
+preload = input("Preload (Y/N)? ")
+
+if preload == 'Y':
+    settings = input("Settings File (txt file): ")
+    with open(settings, 'r', encoding="utf-8") as f:
+        filename = f.readline().strip()
+        safe_point = float(f.readline().strip())
+        print(filename, safe_point)
+else:
+    filename = input("Filename (csv file only): ")
+    safe_point = float(input("Safe Point (Decmial): "))
+
 data = []
 with open(filename, newline='') as csvfile:
     districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
