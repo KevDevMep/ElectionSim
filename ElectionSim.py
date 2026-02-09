@@ -34,9 +34,10 @@ class district:
         self.PacificPct = pacificPct
         self.AsianPct = asianPct
         self.NativePct = nativePct
+        self.Majority = ""
 
     def to_string(self):
-        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}')
+        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}, Majority: {self.Majority}')
 
     def shift(self, shift_amount, group = ""):
         if shift_amount != 0:
@@ -68,6 +69,22 @@ class district:
     def flip(self):
         self.Flipped = not self.Flipped
 
+    def majority(self):
+        if self.WhitePct > .5:
+            self.Majority = "White"
+        elif self.HispanicPct > self.WhitePct and self.HispanicPct > self.BlackPct and self.HispanicPct > self.AsianPct and self.HispanicPct > self.NativePct and self.HispanicPct > self.PacificPct:
+            self.Majority = "Hispanic"
+        elif self.BlackPct > self.WhitePct and self.BlackPct > self.AsianPct and self.BlackPct > self.NativePct and self.BlackPct > self.PacificPct:
+            self.Majority = "Black"
+        elif self.AsianPct > self.WhitePct and self.AsianPct > self.NativePct and self.AsianPct > self.PacificPct:
+            self.Majority = "Asian"
+        elif self.NativePct > self.WhitePct and self.NativePct > self.PacificPct:
+            self.Majority = "Native"
+        elif self.PacificPct > self.WhitePct:
+            self.Majority = "Pacific"
+        else:
+            self.Majority = "Minority"
+
 def stats(data):
     d_stats = {}
     total = 0
@@ -81,25 +98,12 @@ def stats(data):
             d_stats['R_Safe'] = d_stats.get('R_Safe', 0) + 1
         else:
             d_stats['R_Comp'] = d_stats.get('R_Comp', 0) + 1
-        
-        if d.WhitePct > .5:
-            d_stats['White'] = d_stats.get('White', 0) + 1
-        elif d.BlackPct > .5:
-            d_stats['Black'] = d_stats.get('Black', 0) + 1
-        elif d.HispanicPct > .5:
-            d_stats['Hispanic'] = d_stats.get('Hispanic', 0) + 1
-        elif d.AsianPct > .5:
-            d_stats['Asian'] = d_stats.get('Asian', 0) + 1
-        elif d.NativePct > .5:
-            d_stats['Native'] = d_stats.get('Native', 0) + 1
-        elif d.PacificPct > .5:
-            d_stats['Pacific'] = d_stats.get('Pacific', 0) + 1
-        else:
-            d_stats['Minority'] = d_stats.get('Minority', 0) + 1
+
+        d_stats[d.Majority] = d_stats.get(d.Majority, 0) + 1
 
     print(f"Expected: {total}")
     print(f"D_Safe: {d_stats['D_Safe']}, D_Comp: {d_stats['D_Comp']}, R_Comp: {d_stats['R_Comp']}, R_Safe: {d_stats['R_Safe']}")
-    print(f"White: {d_stats['White']}, Black: {d_stats['Black']}, Hispanic: {d_stats['Hispanic']}, Asian: {d_stats['Asian']}, Minority: {d_stats['Minority']}")
+    print(f"White: {d_stats['White']}, Black: {d_stats['Black']}, Hispanic: {d_stats['Hispanic']}, Asian: {d_stats['Asian']}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
 
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
@@ -125,31 +129,50 @@ with open(filename, newline='') as csvfile:
         cd = f"{row['State']}-{row['Id']}"
         d_expected = expected(float(row[dataset]))
         d = district(cd, float(row[dataset]), float(d_expected), float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+        d.majority()
         data.append(d)
 
 seats = len(data)
-type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats: ")
+type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats, 5 for Export: ")
 while True:
     match type:
         case "0":
                 trails = int(input('How many Times? '))
-                results = {}
-                total, wins = 0, 0
-                with open('results.csv', 'w', newline='') as csvfile:
+                results, districts = {}, {}
+                total, wins, d_safe = 0, 0, 0
+                comp = []
+
+                for d in data:
+                    if d.Expected == 1:
+                        d_safe += 1
+                    elif d_expected != -1:
+                        comp.append(d)
+                
+                with open('Results.csv', 'w', newline='') as csvfile:
                     fieldnames = ['trail', 'd_seats', 'r_seats', 'winner']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writeheader()
                     for i in range(trails):
-                        trail_total = 0
-                        for d in data:
+                        trail_total = d_safe
+                        total += d_safe
+                        for c in comp:
                             n = r.random()
-                            if n < d.Expected:
+                            if n < c.Expected:
                                 total += 1
                                 trail_total += 1
+                                districts[c.CD] = districts.get(c.CD, 0) + 1
                         results[trail_total] = results.get(trail_total, 0) + 1
                         writer.writerow({'trail': i + 1, 'd_seats': trail_total, 'r_seats': seats - trail_total, 'winner': 1 if trail_total > (seats - trail_total) else 0})
                         if trail_total > (seats - trail_total):
                             wins += 1
+
+                with open('District Results.csv', 'w', newline='') as csvfile:
+                    fieldnames = ['CD', 'd_wins', 'r_wins']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    writer.writeheader()
+                    for d in districts:
+                        writer.writerow({'CD': d, 'd_wins': districts[d], 'r_wins': trails - districts[d]})
+
                 print(f'average: {total / trails}, wins: (D: {wins}, R: {trails - wins})')
                 plt.figure(figsize=(16, 10))
                 plt.scatter(results.keys(), results.values())
@@ -169,12 +192,20 @@ while True:
             sd[half].to_string()
             type = input("Again? ")
         case "3":
-            group = input("Racial Group (W: White, B: Black,H: Hispanic, P: Pacific, A: Asian, N: Native): ")
+            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native): ")
             shift_amount = float(input("Shift Amount (As Decmial): "))
             shifter(data, shift_amount, group)
             type = input("Again? ")
         case "4":
             stats(data)
+            type = input("Again? ")
+        case "5":
+            with open('Adjusted.csv', 'w', newline='') as csvfile:
+                fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writeheader()
+                for d in data:
+                    writer.writerow({ 'CD': d.CD, 'Margin': d.Margin,'Expected': d.Expected, 'WhitePct': d.WhitePct, 'MinorityPct': d.MinorityPct, 'BlackPct': d.BlackPct, 'HispanicPct': d.HispanicPct, 'PacificPct': d.PacificPct, 'AsianPct': d.AsianPct, 'NativePct': d.NativePct, 'Majority': d.Majority })
             type = input("Again? ")
         case _:
             print("End")
