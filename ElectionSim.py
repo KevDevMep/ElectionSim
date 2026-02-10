@@ -1,6 +1,7 @@
 import csv
 import random as r
 import matplotlib.pyplot as plt
+import geopandas as gp
 
 expected = lambda n: min(max((1 + (1 / safe_point) * n) / 2.0, 0.0), 1.0)
 
@@ -38,6 +39,9 @@ class district:
 
     def to_string(self):
         print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}, Majority: {self.Majority}')
+
+    def to_dict(self):
+        return { 'CD': self.CD, 'Margin': self.Margin,'Expected': self.Expected, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'PacificPct': self.PacificPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'Majority': self.Majority }
 
     def shift(self, shift_amount, group = ""):
         if shift_amount != 0:
@@ -102,35 +106,60 @@ def stats(data):
         d_stats[d.Majority] = d_stats.get(d.Majority, 0) + 1
 
     print(f"Expected: {total}")
-    print(f"D_Safe: {d_stats['D_Safe']}, D_Comp: {d_stats['D_Comp']}, R_Comp: {d_stats['R_Comp']}, R_Safe: {d_stats['R_Safe']}")
-    print(f"White: {d_stats['White']}, Black: {d_stats['Black']}, Hispanic: {d_stats['Hispanic']}, Asian: {d_stats['Asian']}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
+    print(f"D_Safe: {d_stats.get('D_Safe', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R_Safe: {d_stats.get('R_Safe', 0)}")
+    print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
 
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
-print("This version is for labeled data")
 
 preload = input("Preload (Y/N)? ")
-
 if preload == 'Y':
     settings = input("Settings File (txt file): ")
     with open(settings, 'r', encoding="utf-8") as f:
+        filetype = f.readline().strip()
         filename = f.readline().strip()
         safe_point = float(f.readline().strip())
-        dataset = f.readline().strip()
+        if filetype == '0':
+            dataset = f.readline().strip()
 else:
-    filename = input("Filename (csv file only): ")
-    dataset = input("dataset (24_Pres, 20_Pres, 20-24_Pres): ")
+    filetype = input("File Type (0 for labeled, 1 for unlabeled, 2 for geojson): ")
+    filename = input("Filename: ")
+    if filetype == '0':
+        dataset = input("Dataset name: ")
     safe_point = float(input("Safe Point (Decmial): "))
 
 data = []
-with open(filename, newline='') as csvfile:
-    districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-    for row in districtreader:
-        cd = f"{row['State']}-{row['Id']}"
-        d_expected = expected(float(row[dataset]))
-        d = district(cd, float(row[dataset]), d_expected, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
-        d.majority()
-        data.append(d)
+match filetype:
+    case '0':
+        with open(filename, newline='') as csvfile:
+            districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+            for row in districtreader:
+                cd = f"{row['State']}-{row['Id']}"
+                d_expected = expected(float(row[dataset]))
+                d = district(cd, float(row[dataset]), d_expected, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+                d.majority()
+                data.append(d)
+    case '1':
+        with open(filename, newline='') as csvfile:
+            districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+            i = 0
+            for row in districtreader:
+                d_expected = expected(float(row['Margin']))
+                d = district(i + 1, float(row['Margin']), d_expected, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+                d.majority()
+                data.append(d)
+                i += 1
+    case '2':
+        gdf = gp.read_file(filename)
+        seats = len(gdf)
+        for i in range(seats):
+            margin = gdf['DemPct'][i] - gdf['RepPct'][i]
+            d_expected = expected(margin)
+            d = district(i + 1, margin, d_expected, gdf['WhitePct'][i], gdf['MinorityPct'][i], gdf['BlackPct'][i], gdf['HispanicPct'][i], gdf['PacificPct'][i], gdf['AsianPct'][i], gdf['NativePct'][i])
+            d.majority()
+            data.append(d)
+    case _:
+        print('Incorrect Input')
 
 seats = len(data)
 type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats, 5 for Export: ")
@@ -160,18 +189,21 @@ while True:
                             if n < c.Expected:
                                 total += 1
                                 trail_total += 1
-                                districts[c.CD] = districts.get(c.CD, 0) + 1
+                                districts[c] = districts.get(c, 0) + 1
                         results[trail_total] = results.get(trail_total, 0) + 1
                         writer.writerow({'trail': i + 1, 'd_seats': trail_total, 'r_seats': seats - trail_total, 'winner': 1 if trail_total > (seats - trail_total) else 0})
                         if trail_total > (seats - trail_total):
                             wins += 1
 
                 with open('District Results.csv', 'w', newline='') as csvfile:
-                    fieldnames = ['CD', 'd_wins', 'r_wins']
+                    fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'd_wins', 'r_wins']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writeheader()
                     for d in districts:
-                        writer.writerow({'CD': d, 'd_wins': districts[d], 'r_wins': trails - districts[d]})
+                        details = d.to_dict()
+                        details['d_wins'] = districts[d]
+                        details['r_wins'] = trails - districts[d]
+                        writer.writerow(details)
 
                 print(f'average: {total / trails}, wins: (D: {wins}, R: {trails - wins})')
                 plt.figure(figsize=(16, 10))
@@ -205,7 +237,7 @@ while True:
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
                 for d in data:
-                    writer.writerow({ 'CD': d.CD, 'Margin': d.Margin,'Expected': d.Expected, 'WhitePct': d.WhitePct, 'MinorityPct': d.MinorityPct, 'BlackPct': d.BlackPct, 'HispanicPct': d.HispanicPct, 'PacificPct': d.PacificPct, 'AsianPct': d.AsianPct, 'NativePct': d.NativePct, 'Majority': d.Majority })
+                    writer.writerow(d.to_dict())
             type = input("Again? ")
         case _:
             print("End")
