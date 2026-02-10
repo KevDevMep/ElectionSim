@@ -145,7 +145,7 @@ while True:
                 for d in data:
                     if d.Expected == 1:
                         d_safe += 1
-                    elif d_expected != -1:
+                    elif d.Expected != 0:
                         comp.append(d)
                 
                 with open('Results.csv', 'w', newline='') as csvfile:
