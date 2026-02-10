@@ -1,4 +1,6 @@
-expected = lambda n, safe_point: min(max((1 + (1 / safe_point) * n) / 2.0, 0.0), 1.0)
+safe_point = .15
+
+expected = lambda n: min(max((1 + (1 / safe_point) * n) / 2.0, 0.0), 1.0)
 
 class District:
     def __init__(self, cd, margin, whitePct, minorityPct, blackPct, hispanicPct, pacificPct, asianPct, nativePct):
@@ -14,14 +16,15 @@ class District:
         self.AsianPct = asianPct
         self.NativePct = nativePct
         self.Majority = ""
+        self.Swing = 0
 
     def to_string(self):
-        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}, Majority: {self.Majority}')
+        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}, Majority: {self.Majority}, Swing: {self.Swing:.2%}')
 
     def to_dict(self):
-        return { 'CD': self.CD, 'Margin': self.Margin,'Expected': self.Expected, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'PacificPct': self.PacificPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'Majority': self.Majority }
+        return { 'CD': self.CD, 'Margin': self.Margin,'Expected': self.Expected, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'PacificPct': self.PacificPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'Majority': self.Majority, 'Swing': self.Swing }
 
-    def shift(self, shift_amount, group = "", safe_point = .15):
+    def shift(self, shift_amount, group = ""):
         if shift_amount != 0:
             ajusted = shift_amount
             match group:
@@ -41,17 +44,19 @@ class District:
                     ajusted *= 1
             if ajusted > 0:
                 if self.Margin < 0 and -self.Margin < ajusted:
-                    self.Flipped = True
+                    self.flip()
             else:
                 if self.Margin > 0 and -self.Margin > ajusted:
-                    self.Flipped = True
+                    self.flip()
             self.Margin = max(min((self.Margin + ajusted), 1), -1)
-            self.expected(safe_point)
+            self.expected()
+            self.Swing += ajusted
+
     def flip(self):
         self.Flipped = not self.Flipped
 
-    def expected(self, safe_point):
-        self.Expected = expected(self.Margin, safe_point)
+    def expected(self):
+        self.Expected = expected(self.Margin)
 
     def majority(self):
         if self.WhitePct > .5:
@@ -68,3 +73,7 @@ class District:
             self.Majority = "Pacific"
         else:
             self.Majority = "Minority"
+
+    def reset(self):
+        self.Margin -= self.Swing
+        self.Swing = 0

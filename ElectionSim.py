@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import geopandas as gp
 import district
 
-def shifter(data, shift_amount, safe_point, group = "",):
+def shifter(data, shift_amount, group = "",):
     demA, demB, totalA, totalB = 0, 0, 0, 0
     for d in data:
         totalA += d.Expected
         if d.Margin > 0:
             demA += 1
-        d.shift(shift_amount, safe_point, group)
+        d.shift(shift_amount, group)
         totalB += d.Expected
         if d.Margin > 0:
             demB += 1
@@ -26,11 +26,11 @@ def stats(data):
     total = 0
     for d in data:
         total += d.Expected
-        if d.Margin > safe_point:
+        if d.Margin > district.safe_point:
             d_stats['D_Safe'] = d_stats.get('D_Safe', 0) + 1
         elif d.Margin > 0:
             d_stats['D_Comp'] = d_stats.get('D_Comp', 0) + 1
-        elif d.Margin < -safe_point:
+        elif d.Margin < -district.safe_point:
             d_stats['R_Safe'] = d_stats.get('R_Safe', 0) + 1
         else:
             d_stats['R_Comp'] = d_stats.get('R_Comp', 0) + 1
@@ -50,7 +50,7 @@ if preload == 'Y':
     with open(settings, 'r', encoding="utf-8") as f:
         filetype = f.readline().strip()
         filename = f.readline().strip()
-        safe_point = float(f.readline().strip())
+        district.safe_point = float(f.readline().strip())
         if filetype == '0':
             dataset = f.readline().strip()
 else:
@@ -58,7 +58,7 @@ else:
     filename = input("Filename: ")
     if filetype == '0':
         dataset = input("Dataset name: ")
-    safe_point = float(input("Safe Point (Decmial): "))
+    district.safe_point = float(input("Safe Point (Decmial): "))
 
 data = []
 match filetype:
@@ -68,7 +68,7 @@ match filetype:
             for row in districtreader:
                 cd = f"{row['State']}-{row['Id']}"
                 d = district.District(cd, float(row[dataset]), float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
-                d.expected(safe_point)
+                d.expected()
                 d.majority()
                 data.append(d)
     case '1':
@@ -78,7 +78,7 @@ match filetype:
             for row in districtreader:
                 margin = float(row['DemPct']) - float(row['RepPct'])
                 d = district.District(i + 1, margin, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
-                d.expected(safe_point)
+                d.expected()
                 d.majority()
                 data.append(d)
                 i += 1
@@ -88,14 +88,14 @@ match filetype:
         for i in range(seats):
             margin = gdf['DemPct'][i] - gdf['RepPct'][i]
             d = district.District(i + 1, margin, gdf['WhitePct'][i], gdf['MinorityPct'][i], gdf['BlackPct'][i], gdf['HispanicPct'][i], gdf['PacificPct'][i], gdf['AsianPct'][i], gdf['NativePct'][i])
-            d.expected(safe_point)
+            d.expected()
             d.majority()
             data.append(d)
     case _:
         print('Incorrect Input')
 
 seats = len(data)
-type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats, 5 for Export: ")
+type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point, 3 for Coalition Builder, 4 for Stats, 5 for Export, 6 for Reset: ")
 while True:
     match type:
         case "0":
@@ -149,7 +149,7 @@ while True:
                 type = input("Again? ")
         case "1":
             shift_amount = float(input("Shift Amount (As Decmial): "))
-            shifter(data, shift_amount, safe_point)
+            shifter(data, shift_amount)
             type = input("Again? ")
         case "2":
             sd = sorted(data, key=lambda n: n.Margin)
@@ -159,7 +159,7 @@ while True:
         case "3":
             group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native): ")
             shift_amount = float(input("Shift Amount (As Decmial): "))
-            shifter(data, shift_amount, safe_point, group)
+            shifter(data, shift_amount, group)
             type = input("Again? ")
         case "4":
             stats(data)
@@ -171,6 +171,10 @@ while True:
                 writer.writeheader()
                 for d in data:
                     writer.writerow(d.to_dict())
+            type = input("Again? ")
+        case "6":
+            for d in data:
+                d.reset()
             type = input("Again? ")
         case _:
             print("End")
