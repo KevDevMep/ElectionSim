@@ -1,6 +1,7 @@
 import csv
 import random as r
 import matplotlib.pyplot as plt
+import geopandas as gp
 # Meant for a unlabeled CSV
 
 expected = lambda n: min(max((1 + (1 / safe_point) * n) / 2, 0), 1)
@@ -103,8 +104,8 @@ def stats(data):
         d_stats[d.Majority] = d_stats.get(d.Majority, 0) + 1
 
     print(f"Expected: {total}")
-    print(f"D_Safe: {d_stats['D_Safe']}, D_Comp: {d_stats['D_Comp']}, R_Comp: {d_stats['R_Comp']}, R_Safe: {d_stats['R_Safe']}")
-    print(f"White: {d_stats['White']}, Black: {d_stats['Black']}, Hispanic: {d_stats['Hispanic']}, Asian: {d_stats['Asian']}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
+    print(f"D_Safe: {d_stats.get('D_Safe', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R_Safe: {d_stats.get('R_Safe', 0)}")
+    print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
 
 print("Election Shifter")
 print("+ numbers for Democrats, - numbers for Republicans")
@@ -115,22 +116,34 @@ preload = input("Preload (Y/N)? ")
 if preload == 'Y':
     settings = input("Settings File (txt file): ")
     with open(settings, 'r', encoding="utf-8") as f:
+        filetype = f.readline().strip()
         filename = f.readline().strip()
         safe_point = float(f.readline().strip())
 else:
-    filename = input("Filename (csv file only): ")
+    filetype = input("FileType (csv or geojson): ")
+    filename = input("Filename: ")
     safe_point = float(input("Safe Point (Decmial): "))
 
 data = []
-with open(filename, newline='') as csvfile:
-    districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-    i = 0
-    for row in districtreader:
-        d_expected = expected(float(row['Margin']))
-        d = district(str(i), float(row['Margin']), float(d_expected), float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+if filetype == 'csv':
+    with open(filename, newline='') as csvfile:
+        districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+        i = 0
+        for row in districtreader:
+            d_expected = expected(float(row['Margin']))
+            d = district(i + 1, float(row['Margin']), d_expected, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+            d.majority()
+            data.append(d)
+            i += 1
+elif filetype == 'geojson':
+    gdf = gp.read_file('NY_Sen.geojson')
+    seats = len(gdf)
+    for i in range(seats):
+        margin = gdf['DemPct'][i] - gdf['RepPct'][i]
+        d_expected = expected(margin)
+        d = district(i + 1, margin, d_expected, gdf['WhitePct'][i], gdf['MinorityPct'][i], gdf['BlackPct'][i], gdf['HispanicPct'][i], gdf['PacificPct'][i], gdf['AsianPct'][i], gdf['NativePct'][i])
         d.majority()
         data.append(d)
-        i += 1
 
 seats = len(data)
 type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point: , 3 for Coalition Builder, 4 for Stats, 5 for Export: ")

@@ -128,7 +128,7 @@ with open(filename, newline='') as csvfile:
     for row in districtreader:
         cd = f"{row['State']}-{row['Id']}"
         d_expected = expected(float(row[dataset]))
-        d = district(cd, float(row[dataset]), float(d_expected), float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+        d = district(cd, float(row[dataset]), d_expected, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
         d.majority()
         data.append(d)
 
