@@ -95,7 +95,7 @@ match filetype:
         print('Incorrect Input')
 
 seats = len(data)
-type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point, 3 for Coalition Builder, 4 for Stats, 5 for Export, 6 for Reset: ")
+type = input("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point, 3 for Coalition Builder, 4 for Stats, 5 for Export, 6 for Filter, 7 for Reset, 8 for Help: ")
 while True:
     match type:
         case "0":
@@ -144,7 +144,6 @@ while True:
                 plt.xlabel('Number of D Seats')
                 plt.ylabel('Trails')
                 plt.title('Simulator Results')
-                plt.grid(True)
                 plt.show()
                 type = input("Again? ")
         case "1":
@@ -157,12 +156,20 @@ while True:
             sd[half].to_string()
             type = input("Again? ")
         case "3":
-            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native): ")
+            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native, M: Minority): ")
             shift_amount = float(input("Shift Amount (As Decmial): "))
             shifter(data, shift_amount, group)
             type = input("Again? ")
         case "4":
             stats(data)
+            lst = []
+            for d in data:
+                lst.append(d.Margin)
+            plt.hist(lst)
+            plt.title('Seat Distribution')
+            plt.xlabel('Margin (%)')
+            plt.ylabel('Count')
+            plt.show()
             type = input("Again? ")
         case "5":
             with open('Adjusted.csv', 'w', newline='') as csvfile:
@@ -173,8 +180,42 @@ while True:
                     writer.writerow(d.to_dict())
             type = input("Again? ")
         case "6":
+            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native, M: Minority): ")
+            count = 0
+            match group:
+                case 'W':
+                    group = 'White'
+                case 'B':
+                    group = 'Black'
+                case 'H':
+                    group = 'Hispanic'
+                case 'P':
+                    group = 'Pacific'
+                case 'A':
+                    group = 'Asian'
+                case 'N':
+                    group = 'Native'
+                case 'M':
+                    group = 'Minority'
+                case _:
+                    group = ''
+            for d in data:
+                if group == '':
+                    d.to_string()
+                    count += 1
+                elif d.Majority == group:
+                    d.to_string()
+                    count += 1
+                
+            print(f'Total: {count}')
+            type = input("Again? ")
+        case "7":
             for d in data:
                 d.reset()
+            type = input("Again? ")
+        case "8":
+            print("0 for Simulator, 1 for Uniform Shifter, 2 for Tipping Point, 3 for Coalition Builder, 4 for Stats, 5 for Export, 6 for Filter, 7 for Reset, 8 for Help")
+            
             type = input("Again? ")
         case _:
             print("End")

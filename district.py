@@ -19,7 +19,7 @@ class District:
         self.Swing = 0
 
     def to_string(self):
-        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}, Majority: {self.Majority}, Swing: {self.Swing:.2%}')
+        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, Swing: {self.Swing:.2%}, Majority: {self.Majority}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, PacificPct: {self.PacificPct:.2%}, NativePct: {self.NativePct:.2%}')
 
     def to_dict(self):
         return { 'CD': self.CD, 'Margin': self.Margin,'Expected': self.Expected, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'PacificPct': self.PacificPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'Majority': self.Majority, 'Swing': self.Swing }
@@ -40,6 +40,8 @@ class District:
                     ajusted *= self.AsianPct
                 case 'N':
                     ajusted *= self.NativePct
+                case 'M':
+                    ajusted *= self.MinorityPct
                 case _:
                     ajusted *= 1
             if ajusted > 0:
