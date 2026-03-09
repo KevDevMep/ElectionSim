@@ -129,7 +129,7 @@ while True:
                             wins += 1
 
                 with open('District Results.csv', 'w', newline='') as csvfile:
-                    fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'Swing', 'd_wins', 'r_wins']
+                    fieldnames = ['d_wins', 'r_wins', 'CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
                     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                     writer.writeheader()
                     for d in districts:
@@ -173,7 +173,7 @@ while True:
             type = input("Again? ")
         case "5":
             with open('Adjusted.csv', 'w', newline='') as csvfile:
-                fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'Swing']
+                fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writeheader()
                 for d in data:

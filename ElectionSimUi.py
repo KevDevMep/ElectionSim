@@ -49,9 +49,11 @@ def load():
                     data.append(d)
             case _:
                 print('Incorrect Input')
+        loaded.set(True)
 
         print('Loading Succesful')
     except:
+        loaded.set(False)
         print('Loading Error')
 
 def simulator():
@@ -87,7 +89,7 @@ def simulator():
                     wins += 1
 
         with open('District Results.csv', 'w', newline='') as csvfile:
-            fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'Swing', 'd_wins', 'r_wins']
+            fieldnames = ['d_wins', 'r_wins', 'CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for d in districts:
@@ -156,7 +158,7 @@ def reset():
 
 def export():
     with open('Adjusted.csv', 'w', newline='') as csvfile:
-        fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'Swing']
+        fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for d in data:
@@ -167,6 +169,8 @@ root = tk.Tk()
 root.config(background='skyblue')
 root.title('Election Simulator')
 root.minsize(300, 300)
+
+loaded = tk.BooleanVar()
 
 title1 = tk.Label(root, text='Preset').grid(row=0,column=2)
 preset = tk.Entry(root)
@@ -206,5 +210,6 @@ submit4 = tk.Button(root, text='Shift', command=shifter).grid(row=17,column=0)
 submit5 = tk.Button(root, text='Median', command=median).grid(row=5,column=2)
 submit6 = tk.Button(root, text='Export', command=export).grid(row=7,column=2)
 submit7 = tk.Button(root, text='Reset', command=reset).grid(row=6,column=2)
+check = tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=8, column=2)
 
 root.mainloop()

@@ -22,7 +22,7 @@ class District:
         print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, Swing: {self.Swing:.2%}, Majority: {self.Majority}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, AsianPct: {self.AsianPct:.2%}, NativePct: {self.NativePct:.2%}, PacificPct: {self.PacificPct:.2%}')
 
     def to_dict(self):
-        return { 'CD': self.CD, 'Margin': self.Margin,'Expected': self.Expected, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'PacificPct': self.PacificPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'Majority': self.Majority, 'Swing': self.Swing }
+        return { 'CD': self.CD, 'Margin': self.Margin, 'Swing': self.Swing, 'Majority': self.Majority, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'PacificPct': self.PacificPct}
 
     def shift(self, shift_amount, group = "", print_ = True):
         if shift_amount != 0:
