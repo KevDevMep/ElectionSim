@@ -81,10 +81,10 @@ def simulator():
                         total += 1
                         trail_total += 1
                         districts[c] = districts.get(c, 0) + 1
-                    results[trail_total] = results.get(trail_total, 0) + 1
-                    writer.writerow({'trail': i + 1, 'd_seats': trail_total, 'r_seats': seats - trail_total, 'winner': 1 if trail_total > (seats - trail_total) else 0})
-                    if trail_total > (seats - trail_total):
-                        wins += 1
+                results[trail_total] = results.get(trail_total, 0) + 1
+                writer.writerow({'trail': i + 1, 'd_seats': trail_total, 'r_seats': seats - trail_total, 'winner': 1 if trail_total > (seats - trail_total) else 0})
+                if trail_total > (seats - trail_total):
+                    wins += 1
 
         with open('District Results.csv', 'w', newline='') as csvfile:
             fieldnames = ['CD', 'Margin', 'Expected', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'PacificPct', 'AsianPct', 'NativePct', 'Majority', 'Swing', 'd_wins', 'r_wins']
