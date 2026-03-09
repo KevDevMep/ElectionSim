@@ -142,7 +142,7 @@ while True:
                 plt.figure(figsize=(16, 10))
                 plt.scatter(results.keys(), results.values())
                 plt.xlabel('Number of D Seats')
-                plt.ylabel('Trails')
+                plt.ylabel('Count')
                 plt.title('Simulator Results')
                 plt.show()
                 type = input("Again? ")
@@ -152,11 +152,11 @@ while True:
             type = input("Again? ")
         case "2":
             sd = sorted(data, key=lambda n: n.Margin)
-            half = seats // 2
-            sd[half].to_string()
+            print('Median Seat: ')
+            sd[seats//2].to_string()
             type = input("Again? ")
         case "3":
-            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native, M: Minority): ")
+            group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native): ")
             shift_amount = float(input("Shift Amount (As Decmial): "))
             shifter(data, shift_amount, group)
             type = input("Again? ")
