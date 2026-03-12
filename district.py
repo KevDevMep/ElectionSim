@@ -19,7 +19,7 @@ class District:
         self.Swing = 0
 
     def to_string(self):
-        print(f'CD: {self.CD}, Margin: {self.Margin:.2%}, Swing: {self.Swing:.2%}, Majority: {self.Majority}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, AsianPct: {self.AsianPct:.2%}, NativePct: {self.NativePct:.2%}, PacificPct: {self.PacificPct:.2%}')
+        return(f'CD: {self.CD}, Margin: {self.Margin:.2%}, Swing: {self.Swing:.2%}, Majority: {self.Majority}, WhitePct: {self.WhitePct:.2%}, MinorityPct: {self.MinorityPct:.2%}, BlackPct: {self.BlackPct:.2%}, HispanicPct: {self.HispanicPct:.2%}, AsianPct: {self.AsianPct:.2%}, NativePct: {self.NativePct:.2%}, PacificPct: {self.PacificPct:.2%}')
 
     def to_dict(self):
         return { 'CD': self.CD, 'Margin': self.Margin, 'Swing': self.Swing, 'Majority': self.Majority, 'WhitePct': self.WhitePct, 'MinorityPct': self.MinorityPct, 'BlackPct': self.BlackPct, 'HispanicPct': self.HispanicPct, 'AsianPct': self.AsianPct, 'NativePct': self.NativePct, 'PacificPct': self.PacificPct}

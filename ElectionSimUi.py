@@ -147,23 +147,48 @@ def stats():
         pass
 
 def median():
-    sd = sorted(data, key=lambda n: n.Margin)
-    print('Median Seat: ')
-    sd[len(data) // 2].to_string()
+    if data != []:
+        sd = sorted(data, key=lambda n: n.Margin)
+        print('Median Seat: ')
+        print(sd[len(data) // 2].to_string())
+    else:
+        print('Data not loaded')
 
 def reset():
-    for d in data:
-        d.reset()
-    print('reset')
+    if data != []:
+        for d in data:
+            d.reset()
+        print('reset')
+    else:
+        print('Data not loaded')
 
 def export():
-    with open('Adjusted.csv', 'w', newline='') as csvfile:
-        fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+    if data != []:
+        with open('Adjusted.csv', 'w', newline='') as csvfile:
+            fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
+            for d in data:
+                writer.writerow(d.to_dict())
+        print('exported')
+    else:
+        print('Data not loaded')
+
+def filter():
+    if data != []:
+        count = 0
+        selections = set([white.get(), black.get(), hispanic.get(), asian.get(), native.get(), minority.get()])
         for d in data:
-            writer.writerow(d.to_dict())
-    print('exported')
+            if d.Majority in selections:
+                if dem.get() and d.Margin > 0:
+                    count += 1
+                    print(d.to_string())
+                elif rep.get() and d.Margin < 0:
+                    count += 1
+                    print(d.to_string())
+        print(f'Total: {count}')
+    else:
+        print('Data not loaded')
 
 root = tk.Tk()
 root.config(background='skyblue')
@@ -171,6 +196,15 @@ root.title('Election Simulator')
 root.minsize(300, 300)
 
 loaded = tk.BooleanVar()
+white = tk.StringVar()
+black = tk.StringVar()
+hispanic = tk.StringVar()
+asian = tk.StringVar()
+native = tk.StringVar()
+pacific = tk.StringVar()
+minority = tk.StringVar()
+dem = tk.BooleanVar(value=True)
+rep = tk.BooleanVar(value=True)
 
 title1 = tk.Label(root, text='Preset').grid(row=0,column=2)
 preset = tk.Entry(root)
@@ -211,5 +245,17 @@ submit5 = tk.Button(root, text='Median', command=median).grid(row=5,column=2)
 submit6 = tk.Button(root, text='Export', command=export).grid(row=7,column=2)
 submit7 = tk.Button(root, text='Reset', command=reset).grid(row=6,column=2)
 check = tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=8, column=2)
+
+title4 = tk.Label(root, text='Filters').grid(row=0, column=4)
+check2 = tk.Checkbutton(root, variable=white, onvalue='White', offvalue='', text='White').grid(row=1, column=4)
+check3 = tk.Checkbutton(root, variable=black, onvalue='Black', offvalue='',text='Black').grid(row=2, column=4)
+check4 = tk.Checkbutton(root, variable=hispanic, onvalue='Hispanic', offvalue='', text='Hispanic').grid(row=3, column=4)
+check5 = tk.Checkbutton(root, variable=asian, onvalue='Asian', offvalue='', text='Asian').grid(row=4, column=4)
+check6 = tk.Checkbutton(root, variable=native, text='Native', onvalue='Native', offvalue='').grid(row=5, column=4)
+check7 = tk.Checkbutton(root, variable=pacific, text='Pacific', onvalue='Pacific', offvalue='').grid(row=6, column=4)
+check8 = tk.Checkbutton(root, variable=minority, text='Minority', onvalue='Minority', offvalue='').grid(row=7, column=4)
+check9 = tk.Checkbutton(root, variable=dem, text='Dem', onvalue=True, offvalue=False).grid(row=8, column=4)
+check10 = tk.Checkbutton(root, variable=rep, text='Rep', onvalue=True, offvalue=False).grid(row=9, column=4)
+submit8 = tk.Button(root, text='Filter', command=filter).grid(row=10, column=4)
 
 root.mainloop()

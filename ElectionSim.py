@@ -18,7 +18,7 @@ def shifter(data, shift_amount, group = "",):
     print(f"After Shift: (D: {demB},R: {len(data) - demB}, E: {totalB:.2f}) with {demB - demA} flipped seats")
     for d in data:
         if d.Flipped:
-            d.to_string()
+            print(d.to_string())
             d.flip()
 
 def stats(data):
@@ -153,7 +153,7 @@ while True:
         case "2":
             sd = sorted(data, key=lambda n: n.Margin)
             print('Median Seat: ')
-            sd[seats//2].to_string()
+            print(sd[seats//2].to_string())
             type = input("Again? ")
         case "3":
             group = input("Racial Group (W: White, B: Black, H: Hispanic, P: Pacific, A: Asian, N: Native): ")
@@ -201,10 +201,10 @@ while True:
                     group = ''
             for d in data:
                 if group == '':
-                    d.to_string()
+                    print(d.to_string())
                     count += 1
                 elif d.Majority == group:
-                    d.to_string()
+                    print(d.to_string())
                     count += 1
                 
             print(f'Total: {count}')
