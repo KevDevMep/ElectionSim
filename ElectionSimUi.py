@@ -107,7 +107,7 @@ def simulator():
         plt.show()
         print('Sim Complete')
     else:
-        print('Sim passed')
+        print('Data is not loaded')
         pass
 
 def shifter():
@@ -119,7 +119,7 @@ def shifter():
                 d.shift(vals[i], groups[i], print_=False)
         print('Shifted')
     else:
-        print('data is empty')
+        print('Data is not loaded')
         pass
 
 def stats():
@@ -143,7 +143,7 @@ def stats():
         print(f"D_Safe: {d_stats.get('D_Safe', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R_Safe: {d_stats.get('R_Safe', 0)}")
         print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
     else:
-        print('data is empty')
+        print('Data is not loaded')
         pass
 
 def median():
@@ -152,15 +152,15 @@ def median():
         print('Median Seat: ')
         print(sd[len(data) // 2].to_string())
     else:
-        print('Data not loaded')
+        print('Data is not loaded')
 
 def reset():
     if data != []:
         for d in data:
             d.reset()
-        print('reset')
+        print('Reset')
     else:
-        print('Data not loaded')
+        print('Data is not loaded')
 
 def export():
     if data != []:
@@ -170,9 +170,9 @@ def export():
             writer.writeheader()
             for d in data:
                 writer.writerow(d.to_dict())
-        print('exported')
+        print('Exported')
     else:
-        print('Data not loaded')
+        print('Data is not loaded')
 
 def filter():
     if data != []:
@@ -182,13 +182,15 @@ def filter():
             if d.Majority in selections:
                 if dem.get() and d.Margin > 0:
                     count += 1
-                    print(d.to_string())
+                    if details.get():
+                        print(d.to_string())
                 elif rep.get() and d.Margin < 0:
                     count += 1
-                    print(d.to_string())
+                    if details.get():
+                        print(d.to_string())
         print(f'Total: {count}')
     else:
-        print('Data not loaded')
+        print('Data is not loaded')
 
 root = tk.Tk()
 root.config(background='skyblue')
@@ -205,6 +207,7 @@ pacific = tk.StringVar()
 minority = tk.StringVar()
 dem = tk.BooleanVar(value=True)
 rep = tk.BooleanVar(value=True)
+details = tk.BooleanVar()
 
 title1 = tk.Label(root, text='Preset').grid(row=0,column=2)
 preset = tk.Entry(root)
@@ -256,6 +259,7 @@ check7 = tk.Checkbutton(root, variable=pacific, text='Pacific', onvalue='Pacific
 check8 = tk.Checkbutton(root, variable=minority, text='Minority', onvalue='Minority', offvalue='').grid(row=7, column=4)
 check9 = tk.Checkbutton(root, variable=dem, text='Dem', onvalue=True, offvalue=False).grid(row=8, column=4)
 check10 = tk.Checkbutton(root, variable=rep, text='Rep', onvalue=True, offvalue=False).grid(row=9, column=4)
+check11 = tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=9, column=2)
 submit8 = tk.Button(root, text='Filter', command=filter).grid(row=10, column=4)
 
 root.mainloop()
