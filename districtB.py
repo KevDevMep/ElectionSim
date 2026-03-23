@@ -1,6 +1,7 @@
 import geopandas as gp
 import random as r
 import matplotlib.pyplot as plt
+import csv
 
 safe_point = .15
 gdf = gp.GeoDataFrame()
@@ -27,7 +28,7 @@ def majority():
 def setExpected():
     gdf['Expected'] = 0.0
     for i in range(len(gdf)):
-        gdf.loc[i, 'Expected'] = expected(gdf['Margin'][i])
+        gdf.loc[i, 'Expected'] = expected(gdf['ShiftedMargin'][i])
 
 def setMargin():
     for i in range(len(gdf)):
@@ -43,11 +44,11 @@ def loading():
 
 def stats():
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
-    print(f'Median District Margin: {gdf['Margin'].median():.2%}')
-    print(f'Min District Margin: {gdf['Margin'].min():.2%}')
-    print(f'Max District Margin: {gdf['Margin'].max():.2%}')
+    print(f'Median District ShiftedMargin: {gdf['ShiftedMargin'].median():.2%}')
+    print(f'Min District ShiftedMargin: {gdf['ShiftedMargin'].min():.2%}')
+    print(f'Max District ShiftedMargin: {gdf['ShiftedMargin'].max():.2%}')
     print(gdf['Majority'].value_counts())
-    print(gdf.groupby('Majority').agg({'Margin': ['mean', 'min', 'max']}))
+    print(gdf.groupby('Majority').agg({'ShiftedMargin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
 
 def reset():
@@ -58,58 +59,58 @@ def filter(selections: set, dem: bool, rep: bool, details: bool):
     count = 0
     for i in range(len(gdf)):
         if gdf['Majority'][i] in selections:
-            if dem and gdf['Margin'][i] > 0:
+            if dem and gdf['ShiftedMargin'][i] > 0:
                 count += 1
                 if details:
                     print(gdf.iloc[i])
-            elif rep and gdf['Margin'][i] < 0:
+            elif rep and gdf['ShiftedMargin'][i] < 0:
                 count += 1
                 if details:
                     print(gdf.iloc[i])
     print(f'Total: {count}')
 
-def shift(shift_amount, index:int ,group = ""):
+def shift(shift_amount:float, index: int, group:str, turnout:float):
     if shift_amount != 0:
         ajusted = shift_amount
         match group:
             case 'W':
-                ajusted *= gdf['WhitePct'][index]
+                ajusted *= gdf['WhitePct'][index] * turnout
             case 'B':
-                ajusted *= gdf['BlackPct'][index]
+                ajusted *= gdf['BlackPct'][index] * turnout
             case 'H':
-                ajusted *= gdf['HispanicPct'][index]
+                ajusted *= gdf['HispanicPct'][index] * turnout
             case 'P':
-                ajusted *= gdf['PacificPct'][index]
+                ajusted *= gdf['PacificPct'][index] * turnout
             case 'A':
-                ajusted *= gdf['AsianPct'][index]
+                ajusted *= gdf['AsianPct'][index] * turnout
             case 'N':
-                ajusted *= gdf['NativePct'][index]
+                ajusted *= gdf['NativePct'][index] * turnout
             case _:
                 ajusted *= 1
-        gdf.loc[index, 'Margin'] = max(min((gdf['Margin'][index] + ajusted), 1), -1)
-        gdf.loc[index, 'Expected'] = expected(gdf['Margin'][index])
-        gdf.loc[index, 'Swing'] += gdf['Swing'][index] + ajusted
+        gdf.loc[index, 'ShiftedMargin'] = max(min((gdf['ShiftedMargin'][index] + ajusted), 1), -1)
+        gdf.loc[index, 'Expected'] = expected(gdf['ShiftedMargin'][index])
+        gdf.loc[index, 'Swing'] = gdf['Swing'][index] + ajusted
 
-def shifter(groups, vals):
-    medianA = gdf['Margin'].median()
+def shifter(groups, vals, turnout):
+    medianA = gdf['ShiftedMargin'].median()
     expectedA = gdf['Expected'].sum()
-    minA = gdf['Margin'].min()
-    maxA = gdf['Margin'].max()
+    minA = gdf['ShiftedMargin'].min()
+    maxA = gdf['ShiftedMargin'].max()
     for i in range(len(groups)):
         for j in range(len(gdf)):
-            shift(vals[i], j, groups[i])
+            shift(vals[i], j, groups[i], turnout[i])
     print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
-    print(f'After, Median: {gdf['Margin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}')
+    print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
     classify()
 
 def classify():
     gdf['Class'] = ''
     for i in range(len(gdf)):
-        if gdf['Margin'][i] > safe_point:
+        if gdf['ShiftedMargin'][i] > safe_point:
             gdf.loc[i, 'Class'] = 'D'
-        elif gdf['Margin'][i] > 0:
+        elif gdf['ShiftedMargin'][i] > 0:
             gdf.loc[i, 'Class'] = 'D_Comp'
-        elif gdf['Margin'][i] < -safe_point:
+        elif gdf['ShiftedMargin'][i] < -safe_point:
             gdf.loc[i, 'Class'] = 'R'
         else:
             gdf.loc[i, 'Class'] = 'R_Comp'
@@ -120,17 +121,22 @@ def simulator(nTrails: int):
     total, wins, d_safe = 0, 0, len(gdf[gdf['Class'] == 'D'])
     comp = gdf[(gdf['Class'] == 'D_Comp') | (gdf['Class'] == 'R_Comp')]
                     
-    for i in range(nTrails):
-        trail_total = d_safe
-        total += d_safe
-        for i in comp['Expected']:
-            n = r.random()
-            if n < i:
-                total += 1
-                trail_total += 1
-        results[trail_total] = results.get(trail_total, 0) + 1
-        if trail_total > (seats - trail_total):
-            wins += 1
+    with open('Results.csv', 'w', newline='') as csvfile:
+        fieldnames = ['trail', 'd_seats', 'r_seats', 'winner']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in range(nTrails):
+            trail_total = d_safe
+            total += d_safe
+            for i in comp['Expected']:
+                n = r.random()
+                if n < i:
+                    total += 1
+                    trail_total += 1
+            results[trail_total] = results.get(trail_total, 0) + 1
+            writer.writerow({'trail': i + 1, 'd_seats': trail_total, 'r_seats': seats - trail_total, 'winner': 1 if trail_total > (seats - trail_total) else 0})
+            if trail_total > (seats - trail_total):
+                wins += 1
 
     print(f'Average Districts Won: {total / nTrails}, Wins: (D: {wins}, R: {nTrails - wins})')
     plt.figure(figsize=(16, 10))
@@ -152,11 +158,11 @@ def map(type:str):
             plt.title('MinorityPct')
             plt.show()
         case 'DemPct':
-            gdf.plot(column='Margin', cmap='Blues', legend=True)
+            gdf.plot(column='ShiftedMargin', cmap='Blues', legend=True)
             plt.title('DemPct')
             plt.show()
         case 'RepPct':
-            gdf.plot(column='Margin', cmap='Reds', legend=True)
+            gdf.plot(column='ShiftedMargin', cmap='Reds', legend=True)
             plt.title('RepPct')
             plt.show()
         case 'Swing':
