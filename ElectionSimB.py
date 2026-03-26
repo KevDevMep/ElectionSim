@@ -9,14 +9,11 @@ data = []
 
 def load():
     try:
-        with open(preset.get().strip(), 'r', encoding="utf-8") as f:
-            filename = f.readline().strip()
-
-        B.gdf = gp.read_file(filename, use_arrow=True)
-        B.loading()
+        B.gdf = gp.read_file(filename.get().strip(), use_arrow=True)
+        B.loading(not(label.get()))
         loaded.set(True)
         print('Loading Succesful')
-    except:
+    except(OSError):
         loaded.set(False)
         print('Loading Error')
 
@@ -110,11 +107,13 @@ asian = tk.StringVar()
 native = tk.StringVar()
 pacific = tk.StringVar()
 minority = tk.StringVar()
+filename = tk.StringVar()
 dem = tk.BooleanVar(value=True)
 rep = tk.BooleanVar(value=True)
 details = tk.BooleanVar()
 safe_point = tk.DoubleVar(value=.15)
 mapType = tk.StringVar(value='')
+label = tk.BooleanVar()
 a = tk.IntVar(value=0)
 b = tk.IntVar(value=0)
 c = tk.IntVar(value=0)
@@ -132,8 +131,7 @@ to7 = tk.DoubleVar(value=1)
 
 # Middle Section
 title1 = tk.Label(root, text='File').grid(row=0,column=3)
-preset = tk.Entry(root)
-preset.grid(row=1,column=3)
+preset = tk.Entry(root, textvariable=filename).grid(row=1,column=3)
 submit1 = tk.Button(root, text='Load', command=load).grid(row=1,column=4)
 title3 = tk.Label(root, text='Safe Point').grid(row=2, column=3)
 s8 = tk.Spinbox(root, from_=0, to_=1, textvariable=safe_point, increment=.01).grid(row=3, column=3)
@@ -147,6 +145,8 @@ submit6 = tk.Button(root, text='Export', command=export).grid(row=8,column=3)
 submit7 = tk.Button(root, text='Reset', command=reset).grid(row=7,column=3)
 check11 = tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=10, column=3)
 check = tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=9, column=3)
+r6 = tk.Radiobutton(root, variable=label, text='National', value=False).grid(row=11, column=3)
+r7 = tk.Radiobutton(root, variable=label, text='State', value=True).grid(row=12, column=3)
 
 # Shifting Section
 title3 = tk.Label(root, text='Shifting').grid(row=0,column=0)

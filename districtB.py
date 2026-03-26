@@ -36,7 +36,12 @@ def setMargin():
     gdf['ShiftedMargin'] = gdf['Margin']
     gdf['Swing'] = 0.0
 
-def loading():
+def setId():
+    gdf['id'] = [i + 1 for i in range(len(gdf))]
+
+def loading(label: bool):
+    if label:
+        setId()
     majority()
     setMargin()
     setExpected()
@@ -44,9 +49,9 @@ def loading():
 
 def stats():
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
-    print(f'Median District ShiftedMargin: {gdf['ShiftedMargin'].median():.2%}')
-    print(f'Min District ShiftedMargin: {gdf['ShiftedMargin'].min():.2%}')
-    print(f'Max District ShiftedMargin: {gdf['ShiftedMargin'].max():.2%}')
+    print(f'Median District Margin: {gdf['ShiftedMargin'].median():.2%}')
+    print(f'Min District Margin: {gdf['ShiftedMargin'].min():.2%}')
+    print(f'Max District Margin: {gdf['ShiftedMargin'].max():.2%}')
     print(gdf['Majority'].value_counts())
     print(gdf.groupby('Majority').agg({'ShiftedMargin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
@@ -139,7 +144,6 @@ def simulator(nTrails: int):
                 wins += 1
 
     print(f'Average Districts Won: {total / nTrails}, Wins: (D: {wins}, R: {nTrails - wins})')
-    plt.figure(figsize=(16, 10))
     plt.scatter(results.keys(), results.values())
     plt.xlabel('Number of D Seats')
     plt.ylabel('Count')
@@ -150,23 +154,23 @@ def simulator(nTrails: int):
 def map(type:str):
     match type:
         case 'Margin':
-            gdf.plot(column='ShiftedMargin', cmap='RdBu', legend=True)
+            gdf.plot(column='ShiftedMargin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Margin')
             plt.show()
         case 'MinorityPct':
-            gdf.plot(column='MinorityPct', cmap='Greys', legend=True)
+            gdf.plot(column='MinorityPct', cmap='Greys', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('MinorityPct')
             plt.show()
         case 'DemPct':
-            gdf.plot(column='ShiftedMargin', cmap='Blues', legend=True)
+            gdf.plot(column='ShiftedMargin', cmap='Blues', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('DemPct')
             plt.show()
         case 'RepPct':
-            gdf.plot(column='ShiftedMargin', cmap='Reds', legend=True)
+            gdf.plot(column='ShiftedMargin', cmap='Reds', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('RepPct')
             plt.show()
         case 'Swing':
-            gdf.plot(column='Swing', cmap='RdBu', legend=True)
+            gdf.plot(column='Swing', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Swing')
             plt.show()
         case _:
