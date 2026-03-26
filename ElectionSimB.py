@@ -13,7 +13,7 @@ def load():
         B.loading(not(label.get()))
         loaded.set(True)
         print('Loading Succesful')
-    except(OSError):
+    except:
         loaded.set(False)
         print('Loading Error')
 
@@ -30,7 +30,7 @@ def shifter():
     if loaded.get():
         groups = ['', 'W', 'B', 'H', 'A', 'N', 'P']
         vals = [a.get() / 100.0, b.get() / 100.0, c.get() / 100.0, d.get()/ 100.0, e.get() / 100.0, f.get() / 100.0, g.get() / 100.0]
-        turnout = [to1.get(), to2.get(), to3.get(), to4.get(), to5.get(), to6.get(), to7.get(),]
+        turnout = [to1.get() / 100.0, to2.get() / 100.0, to3.get() / 100.0, to4.get() / 100.0, to5.get() / 100.0, to6.get() / 100.0, to7.get() / 100.0]
         B.shifter(groups, vals, turnout)
         print('Shifted')
     else:
@@ -83,7 +83,7 @@ def filter():
         print('File is not loaded')
 
 def setSafePoint():
-    B.safe_point = safe_point.get()
+    B.safe_point = safe_point.get() / 100.0
     B.setExpected()
     B.classify()
     print('Set')
@@ -111,7 +111,7 @@ filename = tk.StringVar()
 dem = tk.BooleanVar(value=True)
 rep = tk.BooleanVar(value=True)
 details = tk.BooleanVar()
-safe_point = tk.DoubleVar(value=.15)
+safe_point = tk.IntVar(value=15)
 mapType = tk.StringVar(value='')
 label = tk.BooleanVar()
 a = tk.IntVar(value=0)
@@ -121,20 +121,20 @@ d = tk.IntVar(value=0)
 e = tk.IntVar(value=0)
 f = tk.IntVar(value=0)
 g = tk.IntVar(value=0)
-to1 = tk.DoubleVar(value=1)
-to2 = tk.DoubleVar(value=1)
-to3 = tk.DoubleVar(value=1)
-to4 = tk.DoubleVar(value=1)
-to5 = tk.DoubleVar(value=1)
-to6 = tk.DoubleVar(value=1)
-to7 = tk.DoubleVar(value=1)
+to1 = tk.IntVar(value=100)
+to2 = tk.IntVar(value=100)
+to3 = tk.IntVar(value=100)
+to4 = tk.IntVar(value=100)
+to5 = tk.IntVar(value=100)
+to6 = tk.IntVar(value=100)
+to7 = tk.IntVar(value=100)
 
 # Middle Section
 title1 = tk.Label(root, text='File').grid(row=0,column=3)
 preset = tk.Entry(root, textvariable=filename).grid(row=1,column=3)
 submit1 = tk.Button(root, text='Load', command=load).grid(row=1,column=4)
-title3 = tk.Label(root, text='Safe Point').grid(row=2, column=3)
-s8 = tk.Spinbox(root, from_=0, to_=1, textvariable=safe_point, increment=.01).grid(row=3, column=3)
+title3 = tk.Label(root, text='Safe Point (%)').grid(row=2, column=3)
+s8 = tk.Spinbox(root, from_=0, to_=100, textvariable=safe_point).grid(row=3, column=3)
 submit9 = tk.Button(root, text='Set', command=setSafePoint).grid(row=3, column=4)
 title2 = tk.Label(root, text='Trails').grid(row=4,column=3)
 trails = tk.Spinbox(root, from_=1, to=1000)
@@ -150,28 +150,28 @@ r7 = tk.Radiobutton(root, variable=label, text='State', value=True).grid(row=12,
 
 # Shifting Section
 title3 = tk.Label(root, text='Shifting').grid(row=0,column=0)
-title4 = tk.Label(root, text='Turnout').grid(row=0,column=1)
+title4 = tk.Label(root, text='Turnout (%)').grid(row=0,column=1)
 t1 = tk.Label(root, text='Baseline (%)').grid(row=1,column=0)
 s1 = tk.Spinbox(root, from_=-100, to=100, textvariable=a).grid(row=2,column=0)
-s1b = tk.Spinbox(root, from_=0, to=2, textvariable=to1, increment=.01).grid(row=2,column=1)
+s1b = tk.Spinbox(root, from_= 0, to=200, textvariable=to1).grid(row=2,column=1)
 t2 = tk.Label(root, text='White (%)').grid(row=3,column=0)
 s2 = tk.Spinbox(root, from_=-100, to=100, textvariable=b).grid(row=4,column=0)
-s2b = tk.Spinbox(root, from_=0, to=2, textvariable=to2, increment=.01).grid(row=4,column=1)
+s2b = tk.Spinbox(root, from_= 0, to=200, textvariable=to2).grid(row=4,column=1)
 t3 = tk.Label(root, text='Black (%)').grid(row=5,column=0)
 s3 = tk.Spinbox(root, from_=-100, to=100, textvariable=c).grid(row=6,column=0)
-s3b = tk.Spinbox(root, from_=0, to=2, textvariable=to3, increment=.01).grid(row=6,column=1)
+s3b = tk.Spinbox(root, from_= 0, to=200, textvariable=to3).grid(row=6,column=1)
 t4 = tk.Label(root, text='Hispanic (%)').grid(row=7,column=0)
 s4 = tk.Spinbox(root, from_=-100, to=100, textvariable=d).grid(row=8,column=0)
-s4b = tk.Spinbox(root, from_=0, to=2, textvariable=to4, increment=.01).grid(row=8,column=1)
+s4b = tk.Spinbox(root, from_= 0, to=200, textvariable=to4).grid(row=8,column=1)
 t5 = tk.Label(root, text='Asian (%)').grid(row=9,column=0)
 s5 = tk.Spinbox(root, from_=-100, to=100, textvariable=e).grid(row=10,column=0)
-s5b = tk.Spinbox(root, from_=0, to=2, textvariable=to5, increment=.01).grid(row=10,column=1)
+s5b = tk.Spinbox(root, from_= 0, to=200, textvariable=to5).grid(row=10,column=1)
 t6 = tk.Label(root, text='Native (%)').grid(row=11,column=0)
 s6 = tk.Spinbox(root, from_=-100, to=100, textvariable=f).grid(row=12,column=0)
-s6b = tk.Spinbox(root, from_=0, to=2, textvariable=to6, increment=.01).grid(row=12,column=1)
+s6b = tk.Spinbox(root, from_= 0, to=200, textvariable=to6).grid(row=12,column=1)
 t7 = tk.Label(root, text='Pacific (%)').grid(row=13,column=0)
 s7 = tk.Spinbox(root, from_=-100, to=100, textvariable=g).grid(row=14,column=0)
-s7b = tk.Spinbox(root, from_=0, to=2, textvariable=to7, increment=.01).grid(row=14,column=1)
+s7b = tk.Spinbox(root, from_= 0, to=200, textvariable=to7).grid(row=14,column=1)
 submit4 = tk.Button(root, text='Shift', command=shifter).grid(row=17,column=0)
 
 # Filtering Section

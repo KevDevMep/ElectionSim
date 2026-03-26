@@ -47,6 +47,11 @@ def loading(label: bool):
     setExpected()
     classify()
 
+def comp():
+    n = len(gdf)
+    total = sum(2 * abs(.5 - gdf['Expected']))
+    print(f'Competitveness: {((n - total) / n):.2%}')
+
 def stats():
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
     print(f'Median District Margin: {gdf['ShiftedMargin'].median():.2%}')
@@ -55,6 +60,7 @@ def stats():
     print(gdf['Majority'].value_counts())
     print(gdf.groupby('Majority').agg({'ShiftedMargin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
+    comp()
 
 def reset():
     gdf['ShiftedMargin'] = gdf['Margin']
