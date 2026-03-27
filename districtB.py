@@ -52,6 +52,12 @@ def comp():
     total = sum(2 * abs(.5 - gdf['Expected']))
     print(f'Competitveness: {((n - total) / n):.2%}')
 
+def prop(env:float):
+    n = len(gdf)
+    base = n * env
+    diff = abs(gdf['Expected'].sum() - base) / n
+    print(f'Proportionality: {1 - diff:.2%}, Map Diff: {diff:.2%}')
+
 def stats():
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
     print(f'Median District Margin: {gdf['ShiftedMargin'].median():.2%}')
@@ -113,6 +119,7 @@ def shifter(groups, vals, turnout):
     print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
     print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
     classify()
+    setExpected()
 
 def classify():
     gdf['Class'] = ''
@@ -139,9 +146,9 @@ def simulator(nTrails: int):
         for i in range(nTrails):
             trail_total = d_safe
             total += d_safe
-            for i in comp['Expected']:
+            for expected in comp['Expected']:
                 n = r.random()
-                if n < i:
+                if n < expected:
                     total += 1
                     trail_total += 1
             results[trail_total] = results.get(trail_total, 0) + 1
@@ -168,17 +175,38 @@ def map(type:str):
             plt.title('MinorityPct')
             plt.show()
         case 'DemPct':
-            gdf.plot(column='ShiftedMargin', cmap='Blues', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='DemPct', cmap='Blues', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('DemPct')
             plt.show()
         case 'RepPct':
-            gdf.plot(column='ShiftedMargin', cmap='Reds', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='RepPct', cmap='Reds', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('RepPct')
             plt.show()
         case 'Swing':
             gdf.plot(column='Swing', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Swing')
             plt.show()
+        case _:
+            print('Make a Selection')
+    pass
+
+def map2(type:str):
+    match type:
+        case 'Margin':
+            map = gdf.explore(column='ShiftedMargin', cmap='RdBu', legend=True)
+            map.show_in_browser()
+        case 'MinorityPct':
+            map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True)
+            map.show_in_browser()
+        case 'DemPct':
+            map = gdf.explore(column='DemPct', cmap='Blues', legend=True)
+            map.show_in_browser()
+        case 'RepPct':
+            map = gdf.explore(column='RepPct', cmap='Reds', legend=True)
+            map.show_in_browser()
+        case 'Swing':
+            map = gdf.explore(column='Swing', cmap='RdBu', legend=True)
+            map.show_in_browser()
         case _:
             print('Make a Selection')
     pass
