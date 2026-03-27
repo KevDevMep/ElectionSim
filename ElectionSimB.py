@@ -88,7 +88,8 @@ def export():
 def filter():
     if loaded.get():
         selections = set([white.get(), black.get(), hispanic.get(), asian.get(), native.get(), minority.get()])
-        B.filter(selections, dem.get(), rep.get(), details.get())
+        class_ = set([dem.get(), rep.get(), demComp.get(), repComp.get()])
+        B.filter(selections, class_, details.get())
     else:
         print('File is not loaded')
 
@@ -119,8 +120,10 @@ native = tk.StringVar()
 pacific = tk.StringVar()
 minority = tk.StringVar()
 filename = tk.StringVar()
-dem = tk.BooleanVar(value=True)
-rep = tk.BooleanVar(value=True)
+dem = tk.StringVar()
+rep = tk.StringVar()
+demComp = tk.StringVar()
+repComp = tk.StringVar()
 details = tk.BooleanVar()
 safe_point = tk.IntVar(value=15)
 mapType = tk.StringVar(value='')
@@ -198,9 +201,11 @@ tk.Checkbutton(root, variable=asian, onvalue='Asian', offvalue='', text='Asian')
 tk.Checkbutton(root, variable=native, text='Native', onvalue='Native', offvalue='').grid(row=5, column=5)
 tk.Checkbutton(root, variable=pacific, text='Pacific', onvalue='Pacific', offvalue='').grid(row=6, column=5)
 tk.Checkbutton(root, variable=minority, text='Minority', onvalue='Minority', offvalue='').grid(row=7, column=5)
-tk.Checkbutton(root, variable=dem, text='Dem', onvalue=True, offvalue=False).grid(row=8, column=5)
-tk.Checkbutton(root, variable=rep, text='Rep', onvalue=True, offvalue=False).grid(row=9, column=5)
-tk.Button(root, text='Filter', command=filter).grid(row=10, column=5)
+tk.Checkbutton(root, variable=dem, text='Dem', onvalue='D', offvalue='').grid(row=8, column=5)
+tk.Checkbutton(root, variable=rep, text='Rep', onvalue='R', offvalue='').grid(row=9, column=5)
+tk.Checkbutton(root, variable=demComp, text='Dem Comp', onvalue='D_Comp', offvalue='').grid(row=10, column=5)
+tk.Checkbutton(root, variable=repComp, text='Rep Comp', onvalue='R_Comp', offvalue='').grid(row=11, column=5)
+tk.Button(root, text='Filter', command=filter).grid(row=12, column=5)
 
 # Mapping Section
 tk.Label(root, text='Mapping').grid(row=0, column=6)

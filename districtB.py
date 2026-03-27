@@ -55,10 +55,11 @@ def comp():
 def prop(env:float):
     n = len(gdf)
     base = n * env
-    diff = abs(gdf['Expected'].sum() - base) / n
-    print(f'Proportionality: {1 - diff:.2%}, Map Diff: {diff:.2%}')
+    diff = (gdf['Expected'].sum() - base) / n
+    print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
 
 def stats():
+    print(f'Number of Districts: {len(gdf)}')
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
     print(f'Median District Margin: {gdf['ShiftedMargin'].median():.2%}')
     print(f'Min District Margin: {gdf['ShiftedMargin'].min():.2%}')
@@ -72,19 +73,12 @@ def reset():
     gdf['ShiftedMargin'] = gdf['Margin']
     gdf['Swing'] = 0.0
 
-def filter(selections: set, dem: bool, rep: bool, details: bool):
-    count = 0
-    for i in range(len(gdf)):
-        if gdf['Majority'][i] in selections:
-            if dem and gdf['ShiftedMargin'][i] > 0:
-                count += 1
-                if details:
-                    print(gdf.iloc[i])
-            elif rep and gdf['ShiftedMargin'][i] < 0:
-                count += 1
-                if details:
-                    print(gdf.iloc[i])
-    print(f'Total: {count}')
+def filter(selections: set, class_: set, details: bool):
+    filtered = gdf[gdf['Majority'].isin(selections)]
+    filtered = filtered[filtered['Class'].isin(class_)]
+    if details:
+        print(filtered.drop(columns=['geometry', 'opacity', 'color']))
+    print(f'Total: {len(filtered)}')
 
 def shift(shift_amount:float, index: int, group:str, turnout:float):
     if shift_amount != 0:
