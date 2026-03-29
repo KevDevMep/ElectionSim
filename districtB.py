@@ -80,22 +80,22 @@ def filter(selections: set, class_: set, details: bool):
         print(filtered.drop(columns=['geometry', 'opacity', 'color']))
     print(f'Total: {len(filtered)}')
 
-def shift(shift_amount:float, index: int, group:str, turnout:float):
+def shift(shift_amount:float, index: int, group:str):
     if shift_amount != 0:
         ajusted = shift_amount
         match group:
             case 'W':
-                ajusted *= gdf['WhitePct'][index] * turnout
+                ajusted *= gdf['WhitePct'][index]
             case 'B':
-                ajusted *= gdf['BlackPct'][index] * turnout
+                ajusted *= gdf['BlackPct'][index]
             case 'H':
-                ajusted *= gdf['HispanicPct'][index] * turnout
+                ajusted *= gdf['HispanicPct'][index]
             case 'P':
-                ajusted *= gdf['PacificPct'][index] * turnout
+                ajusted *= gdf['PacificPct'][index]
             case 'A':
-                ajusted *= gdf['AsianPct'][index] * turnout
+                ajusted *= gdf['AsianPct'][index]
             case 'N':
-                ajusted *= gdf['NativePct'][index] * turnout
+                ajusted *= gdf['NativePct'][index]
             case _:
                 ajusted *= 1
         gdf.loc[index, 'ShiftedMargin'] = max(min((gdf['ShiftedMargin'][index] + ajusted), 1), -1)
