@@ -102,8 +102,8 @@ def shift(shift_amount:float, index: int, group:str):
         gdf.loc[index, 'Expected'] = expected(gdf['ShiftedMargin'][index])
         gdf.loc[index, 'Swing'] = gdf['Swing'][index] + ajusted
 
-def shifter(groups:list[str], vals:list[float], print:True):
-    if print:
+def shifter(groups:list[str], vals:list[float], print_=True):
+    if print_:
         medianA = gdf['ShiftedMargin'].median()
         expectedA = gdf['Expected'].sum()
         minA = gdf['ShiftedMargin'].min()
@@ -111,7 +111,7 @@ def shifter(groups:list[str], vals:list[float], print:True):
     for i in range(len(groups)):
         for j in range(len(gdf)):
             shift(vals[i], j, groups[i])
-    if print:
+    if print_:
         print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
         print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
     classify()
