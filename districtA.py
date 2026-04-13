@@ -6,7 +6,13 @@ import District
 safe_point = .15
 data = []
 
-def load(file: str):
+def expectedValue():
+    total = 0
+    for district in data:
+        total += district.Expected
+    return total
+
+def load(file:str):
     with open(file, newline='') as csvfile:
         districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         i = 0
@@ -67,7 +73,7 @@ def simulator(trails:int):
         plt.title('Simulator Results')
         plt.show()
 
-def shifter(groups: list[str], vals: list):
+def shifter(groups:list[str], vals:list[float]):
     if data != []:
         for i in range(len(groups)):
             for d in data:
@@ -109,7 +115,7 @@ def export():
             for d in data:
                 writer.writerow(d.to_dict())
 
-def filter(selections: set, details: bool, class_: set):
+def filter(selections:set[str], details:bool, class_:set[str]):
     if data != []:
         count = 0
         for d in data:

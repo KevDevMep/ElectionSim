@@ -102,16 +102,18 @@ def shift(shift_amount:float, index: int, group:str):
         gdf.loc[index, 'Expected'] = expected(gdf['ShiftedMargin'][index])
         gdf.loc[index, 'Swing'] = gdf['Swing'][index] + ajusted
 
-def shifter(groups, vals, turnout):
-    medianA = gdf['ShiftedMargin'].median()
-    expectedA = gdf['Expected'].sum()
-    minA = gdf['ShiftedMargin'].min()
-    maxA = gdf['ShiftedMargin'].max()
+def shifter(groups:list[str], vals:list[float], print:True):
+    if print:
+        medianA = gdf['ShiftedMargin'].median()
+        expectedA = gdf['Expected'].sum()
+        minA = gdf['ShiftedMargin'].min()
+        maxA = gdf['ShiftedMargin'].max()
     for i in range(len(groups)):
         for j in range(len(gdf)):
-            shift(vals[i], j, groups[i], turnout[i])
-    print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
-    print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
+            shift(vals[i], j, groups[i])
+    if print:
+        print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
+        print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
     classify()
     setExpected()
 
@@ -184,7 +186,7 @@ def map(type:str):
             print('Make a Selection')
     pass
 
-def map2(type:str):
+def web_map(type:str):
     match type:
         case 'Margin':
             map = gdf.explore(column='ShiftedMargin', cmap='RdBu', legend=True)

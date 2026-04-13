@@ -2,6 +2,7 @@ import geopandas as gp
 import districtB as B
 import tkinter as tk
 import districtA as A
+import matplotlib.pyplot as plt
 
 def load():
     try:
@@ -121,6 +122,41 @@ def map():
     else:
         print('File not loaded')
 
+def web_map():
+    if loaded.get():
+        if not fileType.get():
+            print('Mapping is not available for CSV')
+        else:
+            B.web_map(mapType.get())
+    else:
+        print('File not loaded')
+
+def advanced():
+    if loaded.get():
+        results = {}
+        shift = -10
+        if fileType.get():
+            B.shifter([''], [-0.1], print=False)
+            results[shift] = B.gdf['Expected'].sum()
+            while shift < 10:
+                shift += 1
+                B.shifter([''], [0.01], print=False)
+                results[shift] = B.gdf['Expected'].sum()
+        else:
+            A.shifter([''], [-0.1])
+
+            results[shift] = A.expectedValue()
+            while shift < 10:
+                shift += 1
+                A.shifter([''], [0.01])
+                results[shift] = A.expectedValue()
+        plt.scatter(results.keys(), results.values())
+        plt.xlabel('Shift')
+        plt.ylabel('Expected Value')
+        plt.show()
+    else:
+        print('File is not loaded')
+
 root = tk.Tk()
 root.config(background='skyblue')
 root.title('Election Simulator')
@@ -160,7 +196,7 @@ to7 = tk.IntVar(value=100)
 trails = tk.IntVar(value=1)
 exportType = tk.StringVar(value='GeoJson')
 base = tk.DoubleVar(value=0.0)
-fileType = tk.BooleanVar(value=True)
+fileType = tk.BooleanVar(value=True) # True = GeoJson, False = CSV
 
 # Middle Section
 tk.Label(root, text='File').grid(row=0,column=3)
@@ -181,6 +217,7 @@ tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=Fa
 tk.Label(root, text='FileType').grid(row=12, column=3)
 tk.Radiobutton(root, text='Geojson', variable=fileType, value=True).grid(row=13, column=3)
 tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=14, column=3)
+tk.Button(root, text='Advanced', command=advanced).grid(row=15,column=3)
 
 # Shifting Section
 tk.Label(root, text='Shifting').grid(row=0,column=0)
@@ -198,7 +235,7 @@ tk.Label(root, text='Native (%)').grid(row=11,column=0)
 tk.Spinbox(root, from_=-100, to=100, textvariable=f).grid(row=12,column=0)
 tk.Label(root, text='Pacific (%)').grid(row=13,column=0)
 tk.Spinbox(root, from_=-100, to=100, textvariable=g).grid(row=14,column=0)
-tk.Button(root, text='Shift', command=shifter).grid(row=17,column=0)
+tk.Button(root, text='Shift', command=shifter).grid(row=15,column=0)
 
 # Filtering Section
 tk.Label(root, text='Filters').grid(row=0, column=5)
@@ -223,6 +260,7 @@ tk.Radiobutton(root, text='Dem', variable=mapType, value='DemPct').grid(row=3, c
 tk.Radiobutton(root, text='Rep', variable=mapType, value='RepPct').grid(row=4, column=6)
 tk.Radiobutton(root, text='Swing', variable=mapType, value='Swing').grid(row=5, column=6)
 tk.Button(root, text='Map', command=map).grid(row=6, column=6)
+tk.Button(root, text='Web Map', command=web_map).grid(row=7, column=6)
 tk.Label(root, text='Export Type').grid(row=8, column=6)
 tk.Radiobutton(root, variable=exportType, text='Geojson', value='Geojson').grid(row=9, column=6)
 tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=10, column=6)
