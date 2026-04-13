@@ -16,7 +16,7 @@ def submit():
         pass
     try:
         gdf = gp.read_file(filename.get().strip(), use_arrow=True)
-        prefix = type.get().strip() + '-'
+        prefix = state.get().strip() + '-'
         setName(gdf, prefix)
         setMargin(gdf)
         gdf.to_file(('F_' + filename.get().strip()), driver='GeoJson')
@@ -26,16 +26,14 @@ def submit():
 
 root = tk.Tk()
 root.config(background='yellow')
-filename = tk.StringVar(value='')
-type = tk.StringVar(value='')
+root.title('Format')
+filename = tk.StringVar()
+state = tk.StringVar()
 
-t1 = tk.Label(root, text='FileName').grid(row=0, column=0)
-e1 = tk.Entry(root, textvariable=filename).grid(row=1, column=0)
-t3 = tk.Label(root, text='Type').grid(row=0, column=1)
-r1 = tk.Radiobutton(root, text='Congress', variable=type, value='CD').grid(row=1, column=1)
-r2 = tk.Radiobutton(root, text='Senate', variable=type, value='SD').grid(row=2, column=1)
-r3 = tk.Radiobutton(root, text='House', variable=type, value='HD').grid(row=3, column=1)
-
-b1 = tk.Button(root, text='Format', command=submit).grid(row=3, column=0)
+tk.Label(root, text='FileName').grid(row=0, column=0)
+tk.Entry(root, textvariable=filename).grid(row=1, column=0)
+tk.Label(root, text='State').grid(row=2, column=0)
+tk.Entry(root, textvariable=state).grid(row=3, column=0)
+tk.Button(root, text='Format', command=submit).grid(row=5, column=0)
 
 root.mainloop()
