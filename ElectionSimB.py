@@ -137,22 +137,24 @@ def advanced():
         shift = -10
         if fileType.get():
             B.shifter([''], [-0.1], print_=False)
-            results[shift] = B.gdf['Expected'].sum()
+            results[shift] = (B.gdf['Expected'].sum() / len(B.gdf)) * 100
             while shift < 10:
                 shift += 1
                 B.shifter([''], [0.01], print_=False)
-                results[shift] = B.gdf['Expected'].sum()
+                results[shift] = (B.gdf['Expected'].sum() / len(B.gdf)) * 100
+            B.reset()
         else:
             A.shifter([''], [-0.1])
-
-            results[shift] = A.expectedValue()
+            results[shift] = (A.expectedValue() / len(A.data)) * 100
             while shift < 10:
                 shift += 1
                 A.shifter([''], [0.01])
-                results[shift] = A.expectedValue()
+                results[shift] = (A.expectedValue() / len(A.data)) * 100
+            A.reset()
         plt.scatter(results.keys(), results.values())
-        plt.xlabel('Shift')
-        plt.ylabel('Expected Value')
+        plt.title('Seat-Vote Curve')
+        plt.xlabel('Shift %')
+        plt.ylabel('Seat %')
         plt.show()
     else:
         print('File is not loaded')
