@@ -8,7 +8,7 @@ def load():
     try:
         if fileType.get():
             B.gdf = gp.read_file(filename.get().strip(), use_arrow=True)
-            B.loading(True)
+            B.loading()
         else:
             A.load(filename.get().strip())
         loaded.set(True)

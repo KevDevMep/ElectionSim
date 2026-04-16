@@ -28,20 +28,18 @@ def majority():
 def setExpected():
     gdf['Expected'] = 0.0
     for i in range(len(gdf)):
-        gdf.loc[i, 'Expected'] = expected(gdf['ShiftedMargin'][i])
+        gdf.loc[i, 'Expected'] = expected(gdf['Margin'][i])
 
 def setMargin():
     for i in range(len(gdf)):
         gdf.loc[i, 'Margin'] = gdf['DemPct'][i] - gdf['RepPct'][i]
-    gdf['ShiftedMargin'] = gdf['Margin']
     gdf['Swing'] = 0.0
 
 def setId():
     gdf['id'] = [i + 1 for i in range(len(gdf))]
 
-def loading(label: bool):
-    if label:
-        setId()
+def loading():
+    setId()
     majority()
     setMargin()
     setExpected()
@@ -61,16 +59,17 @@ def prop(env:float):
 def stats():
     print(f'Number of Districts: {len(gdf)}')
     print(f'Expected Value: {gdf['Expected'].sum():.2f}')
-    print(f'Median District Margin: {gdf['ShiftedMargin'].median():.2%}')
-    print(f'Min District Margin: {gdf['ShiftedMargin'].min():.2%}')
-    print(f'Max District Margin: {gdf['ShiftedMargin'].max():.2%}')
+    print(f'Seat %: {(gdf['Expected'].sum() / len(gdf)):.2%}')
+    print(f'Median District Margin: {gdf['Margin'].median():.2%}')
+    print(f'Min District Margin: {gdf['Margin'].min():.2%}')
+    print(f'Max District Margin: {gdf['Margin'].max():.2%}')
     print(gdf['Majority'].value_counts())
-    print(gdf.groupby('Majority').agg({'ShiftedMargin': ['mean', 'min', 'max']}))
+    print(gdf.groupby('Majority').agg({'Margin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
     comp()
 
 def reset():
-    gdf['ShiftedMargin'] = gdf['Margin']
+    gdf['Margin'] = gdf['DemPct'] - gdf['RepPct']
     gdf['Swing'] = 0.0
 
 def filter(selections: set, class_: set, details: bool):
@@ -98,33 +97,34 @@ def shift(shift_amount:float, index: int, group:str):
                 ajusted *= gdf['NativePct'][index]
             case _:
                 ajusted *= 1
-        gdf.loc[index, 'ShiftedMargin'] = max(min((gdf['ShiftedMargin'][index] + ajusted), 1), -1)
-        gdf.loc[index, 'Expected'] = expected(gdf['ShiftedMargin'][index])
+        gdf.loc[index, 'Margin'] = max(min((gdf['Margin'][index] + ajusted), 1), -1)
+        gdf.loc[index, 'Expected'] = expected(gdf['Margin'][index])
         gdf.loc[index, 'Swing'] = gdf['Swing'][index] + ajusted
 
 def shifter(groups:list[str], vals:list[float], print_=True):
     if print_:
-        medianA = gdf['ShiftedMargin'].median()
-        expectedA = gdf['Expected'].sum()
-        minA = gdf['ShiftedMargin'].min()
-        maxA = gdf['ShiftedMargin'].max()
+        median = gdf['Margin'].median()
+        expected = gdf['Expected'].sum()
+        min = gdf['Margin'].min()
+        max = gdf['Margin'].max()
+        seatPct = expected / len(gdf)
     for i in range(len(groups)):
         for j in range(len(gdf)):
             shift(vals[i], j, groups[i])
     if print_:
-        print(f'Before, Median: {medianA:.2%}, Expected: {expectedA:.2f}, Min: {minA:.2%}, Max: {maxA:.2%}')
-        print(f'After, Median: {gdf['ShiftedMargin'].median():.2%}, Expected: {gdf['Expected'].sum():.2f}, Min: {gdf['ShiftedMargin'].min():.2%}, Max: {gdf['ShiftedMargin'].max():.2%}')
+        print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}')
+        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}')
     classify()
     setExpected()
 
 def classify():
     gdf['Class'] = ''
     for i in range(len(gdf)):
-        if gdf['ShiftedMargin'][i] > safe_point:
+        if gdf['Margin'][i] > safe_point:
             gdf.loc[i, 'Class'] = 'D'
-        elif gdf['ShiftedMargin'][i] > 0:
+        elif gdf['Margin'][i] > 0:
             gdf.loc[i, 'Class'] = 'D_Comp'
-        elif gdf['ShiftedMargin'][i] < -safe_point:
+        elif gdf['Margin'][i] < -safe_point:
             gdf.loc[i, 'Class'] = 'R'
         else:
             gdf.loc[i, 'Class'] = 'R_Comp'
@@ -163,7 +163,7 @@ def simulator(nTrails: int):
 def map(type:str):
     match type:
         case 'Margin':
-            gdf.plot(column='ShiftedMargin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='Margin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Margin')
             plt.show()
         case 'MinorityPct':
@@ -189,19 +189,19 @@ def map(type:str):
 def web_map(type:str):
     match type:
         case 'Margin':
-            map = gdf.explore(column='ShiftedMargin', cmap='RdBu', legend=True)
+            map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='naturalbreaks', k=8)
             map.show_in_browser()
         case 'MinorityPct':
-            map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True)
+            map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case 'DemPct':
-            map = gdf.explore(column='DemPct', cmap='Blues', legend=True)
+            map = gdf.explore(column='DemPct', cmap='Blues', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case 'RepPct':
-            map = gdf.explore(column='RepPct', cmap='Reds', legend=True)
+            map = gdf.explore(column='RepPct', cmap='Reds', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case 'Swing':
-            map = gdf.explore(column='Swing', cmap='RdBu', legend=True)
+            map = gdf.explore(column='Swing', cmap='RdBu', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case _:
             print('Make a Selection')
