@@ -73,19 +73,21 @@ def reset():
 def export():
     if loaded.get():
         try:
-            if not fileType.get():
-                A.export()
-            else:
+            if fileType.get():
                 map = B.gdf.drop(columns=['geometry', 'opacity', 'color'])
                 match exportType.get():
                     case 'GeoJson':
                         B.gdf.to_file('Export.geojson', use_arrow=True, driver='GeoJson')
+                    case 'Shapefile':
+                        B.gdf.to_file('Export.shp', use_arrow=True)
                     case 'CSV':
                         map.to_csv('Export.csv')
                     case 'Json':
                         map.to_json('Export.json')
                     case 'HTML':
                         map.to_html('Export.html')
+            else:
+                A.export()
             print('Exported')
         except:
             print('Export Error')
@@ -115,19 +117,19 @@ def setSafePoint():
 
 def map():
     if loaded.get():
-        if not fileType.get():
-            print('Mapping is not available for CSV')
-        else:
+        if fileType.get():
             B.map(mapType.get())
+        else:
+            print('Mapping is not available for CSV')
     else:
         print('File not loaded')
 
 def web_map():
     if loaded.get():
-        if not fileType.get():
-            print('Mapping is not available for CSV')
-        else:
+        if fileType.get():
             B.web_map(mapType.get())
+        else:
+            print('Mapping is not available for CSV')
     else:
         print('File not loaded')
 
@@ -265,9 +267,10 @@ tk.Button(root, text='Map', command=map).grid(row=6, column=4)
 tk.Button(root, text='Web Map', command=web_map).grid(row=7, column=4)
 tk.Label(root, text='Export Type').grid(row=8, column=4)
 tk.Radiobutton(root, variable=exportType, text='Geojson', value='Geojson').grid(row=9, column=4)
-tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=10, column=4)
-tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=11, column=4)
-tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=12, column=4)
-tk.Button(root, text='Export', command=export).grid(row=13,column=4)
+tk.Radiobutton(root, variable=exportType, text='Shapefile', value='Shapefile').grid(row=10, column=4)
+tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=11, column=4)
+tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=12, column=4)
+tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=13, column=4)
+tk.Button(root, text='Export', command=export).grid(row=14,column=4)
 
 root.mainloop()
