@@ -189,7 +189,7 @@ def map(type:str):
 def web_map(type:str):
     match type:
         case 'Margin':
-            map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='naturalbreaks', k=8)
+            map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=10, legend_kwds=dict(colorbar=False))
             map.show_in_browser()
         case 'MinorityPct':
             map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True, tiles="CartoDB positron")

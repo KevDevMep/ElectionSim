@@ -3,6 +3,7 @@ import districtB as B
 import tkinter as tk
 import districtA as A
 import matplotlib.pyplot as plt
+import numpy as np
 
 def load():
     try:
@@ -119,6 +120,7 @@ def map():
     if loaded.get():
         if fileType.get():
             B.map(mapType.get())
+            print(f'{mapType.get()} Mapped')
         else:
             print('Mapping is not available for CSV')
     else:
@@ -128,6 +130,7 @@ def web_map():
     if loaded.get():
         if fileType.get():
             B.web_map(mapType.get())
+            print(f'{mapType.get()} Web Mapped')
         else:
             print('Mapping is not available for CSV')
     else:
@@ -153,10 +156,15 @@ def advanced():
                 A.shifter([''], [0.01])
                 results[shift] = (A.expectedValue() / len(A.data)) * 100
             A.reset()
-        plt.scatter(results.keys(), results.values())
+        
+        x = np.linspace(-10, 10, 20)
+        y = np.linspace(50 + base.get() - 10, 50 + base.get() + 10, 20)
+        plt.plot(x, y, label='Fair', color='g')
+        plt.scatter(results.keys(), results.values(), label='Actual')
         plt.title('Seat-Vote Curve')
         plt.xlabel('Shift %')
         plt.ylabel('Seat %')
+        plt.legend()
         plt.show()
     else:
         print('File is not loaded')
