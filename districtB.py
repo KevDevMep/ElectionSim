@@ -35,11 +35,8 @@ def setMargin():
         gdf.loc[i, 'Margin'] = gdf['DemPct'][i] - gdf['RepPct'][i]
     gdf['Swing'] = 0.0
 
-def setId():
-    gdf['id'] = [i + 1 for i in range(len(gdf))]
-
 def loading():
-    setId()
+    gdf['id'] = [i + 1 for i in range(len(gdf))]
     majority()
     setMargin()
     setExpected()
@@ -47,12 +44,13 @@ def loading():
 
 def comp():
     n = len(gdf)
-    total = sum(2 * abs(.5 - gdf['Expected']))
+    env = gdf['Margin'].mean()
+    total = sum(2 * abs(.5 - gdf['Expected'] + env))
     print(f'Competitveness: {((n - total) / n):.2%}')
 
-def prop(env:float):
+def prop():
     n = len(gdf)
-    base = n * env
+    base = n * (.5 + gdf['Margin'].mean())
     diff = (gdf['Expected'].sum() - base) / n
     print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
 
@@ -63,9 +61,11 @@ def stats():
     print(f'Median District Margin: {gdf['Margin'].median():.2%}')
     print(f'Min District Margin: {gdf['Margin'].min():.2%}')
     print(f'Max District Margin: {gdf['Margin'].max():.2%}')
+    print(f'Environment: {gdf['Margin'].mean():.2%}')
     print(gdf['Majority'].value_counts())
     print(gdf.groupby('Majority').agg({'Margin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
+    prop()
     comp()
 
 def reset():
@@ -108,12 +108,13 @@ def shifter(groups:list[str], vals:list[float], print_=True):
         min = gdf['Margin'].min()
         max = gdf['Margin'].max()
         seatPct = expected / len(gdf)
+        env = gdf['Margin'].mean()
     for i in range(len(groups)):
         for j in range(len(gdf)):
             shift(vals[i], j, groups[i])
     if print_:
-        print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}')
-        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}')
+        print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}, Environment: {env:.2%}')
+        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {env:.2%}')
     classify()
     setExpected()
 

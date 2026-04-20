@@ -47,7 +47,6 @@ def stats():
     if loaded.get():
         if fileType.get():
             B.stats()
-            B.prop(0.5 + (base.get() / 100.0))
         else:
             A.stats()
     else:
@@ -147,7 +146,8 @@ def advanced():
                 shift += 1
                 B.shifter([''], [0.01], print_=False)
                 results[shift] = (B.gdf['Expected'].sum() / len(B.gdf)) * 100
-            B.reset()
+            B.shifter([''], [-0.1], print_=False)
+            env = B.gdf['Margin'].mean() * 100
         else:
             A.shifter([''], [-0.1])
             results[shift] = (A.expectedValue() / len(A.data)) * 100
@@ -155,10 +155,11 @@ def advanced():
                 shift += 1
                 A.shifter([''], [0.01])
                 results[shift] = (A.expectedValue() / len(A.data)) * 100
-            A.reset()
+            A.shifter([''], [-0.1])
+            env = A.env() * 100
         
         x = np.linspace(-10, 10, 20)
-        y = np.linspace(50 + base.get() - 10, 50 + base.get() + 10, 20)
+        y = np.linspace(50 + env - 10, 50 + env + 10, 20)
         plt.plot(x, y, label='Fair', color='g')
         plt.scatter(results.keys(), results.values(), label='Actual')
         plt.title('Seat-Vote Curve')
@@ -220,16 +221,14 @@ tk.Button(root, text='Set', command=setSafePoint).grid(row=3, column=2)
 tk.Label(root, text='Trails').grid(row=4,column=1)
 tk.Spinbox(root, textvariable=trails, from_=1, to=10000).grid(row=5,column=1)
 tk.Button(root, text='Sim', command=simulator).grid(row=5,column=2)
-tk.Label(root, text='Base Environment (%)').grid(row=6, column=1)
-tk.Spinbox(root, textvariable=base, from_=-50, to=50).grid(row=7, column=1)
-tk.Button(root, text='Stats', command=stats).grid(row=8,column=1)
-tk.Button(root, text='Reset', command=reset).grid(row=9,column=1)
-tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=11, column=1)
-tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=10, column=1)
-tk.Label(root, text='FileType').grid(row=12, column=1)
-tk.Radiobutton(root, text='Geojson', variable=fileType, value=True).grid(row=13, column=1)
-tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=14, column=1)
-tk.Button(root, text='Advanced', command=advanced).grid(row=15,column=1)
+tk.Button(root, text='Stats', command=stats).grid(row=6,column=1)
+tk.Button(root, text='Reset', command=reset).grid(row=7,column=1)
+tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=7, column=2)
+tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=8, column=2)
+tk.Label(root, text='FileType').grid(row=8, column=1)
+tk.Radiobutton(root, text='Geojson', variable=fileType, value=True).grid(row=9, column=1)
+tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=10, column=1)
+tk.Button(root, text='Advanced', command=advanced).grid(row=6,column=2)
 
 # Shifting Section
 tk.Label(root, text='Shifting').grid(row=0,column=0)
