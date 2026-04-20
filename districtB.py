@@ -25,22 +25,18 @@ def majority():
         else:
             gdf.loc[i, 'Majority'] = "Minority"
 
-def setExpected():
-    gdf['Expected'] = 0.0
+def setExpected(load=False):
+    if load:
+        gdf['Expected'] = 0.0
     for i in range(len(gdf)):
         gdf.loc[i, 'Expected'] = expected(gdf['Margin'][i])
-
-def setMargin():
-    for i in range(len(gdf)):
-        gdf.loc[i, 'Margin'] = gdf['DemPct'][i] - gdf['RepPct'][i]
-    gdf['Swing'] = 0.0
 
 def loading():
     gdf['id'] = [i + 1 for i in range(len(gdf))]
     majority()
-    setMargin()
-    setExpected()
-    classify()
+    reset()
+    setExpected(True)
+    classify(True)
 
 def comp():
     n = len(gdf)
@@ -118,8 +114,9 @@ def shifter(groups:list[str], vals:list[float], print_=True):
     classify()
     setExpected()
 
-def classify():
-    gdf['Class'] = ''
+def classify(load=False):
+    if load:
+        gdf['Class'] = ''
     for i in range(len(gdf)):
         if gdf['Margin'][i] > safe_point:
             gdf.loc[i, 'Class'] = 'D'
