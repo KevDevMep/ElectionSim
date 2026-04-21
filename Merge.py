@@ -1,6 +1,5 @@
 import geopandas as gp
 import tkinter as tk
-import pyarrow
 
 def geoMerge():
     if filename1.get().strip() == '' or filename2.get().strip() == '':
@@ -9,13 +8,10 @@ def geoMerge():
         
     try:
         gdf1 = gp.read_file(filename1.get().strip(), use_arrow=True)
-        gdf2 = gp.read_file(filename2.get().strip(), use_arrow=True, columns=['id', 'DemPct', 'RepPct'])
-        gdf2 = gdf2.rename(columns={'DemPct': 'DemPct2', 'RepPct': 'RepPct2'})
-        merged = gdf1.merge(gdf2, on='id')
-        merged = merged.drop(columns=['geometry_y'])
-        merged = merged.rename(columns={'geometry_x':'geometry'})
-        merged['Margin'] = merged['DemPct'] - merged['RepPct']
-        merged['Margin2'] = merged['DemPct2'] - merged['RepPct2']
+        gdf2 = gp.read_file(filename2.get().strip(), use_arrow=True, columns=['DemPct', 'RepPct'])
+        merged = gdf1.merge(gdf2, on='geometry')
+        merged['Margin'] = merged['DemPct_x'] - merged['RepPct_x']
+        merged['Margin2'] = merged['DemPct_y'] - merged['RepPct_y']
         merged['Swing'] = merged['Margin'] - merged['Margin2']
         merged.to_file('Merged.geojson', use_arrow=True, driver='GeoJson')
         print('Success')
