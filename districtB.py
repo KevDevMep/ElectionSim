@@ -37,6 +37,7 @@ def loading():
     reset()
     setExpected(True)
     classify(True)
+    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
 
 def comp():
     n = len(gdf)
@@ -49,6 +50,7 @@ def prop():
     base = n * (.5 + gdf['Margin'].mean())
     diff = (gdf['Expected'].sum() - base) / n
     print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
+    print(f'D Above Mean: {len(gdf[gdf['R_Margin'] > 0])}, R Above Mean: {len(gdf[gdf['R_Margin'] < 0])}')
 
 def stats():
     print(f'Number of Districts: {len(gdf)}')
@@ -113,6 +115,7 @@ def shifter(groups:list[str], vals:list[float], print_=True):
         print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {env:.2%}')
     classify()
     setExpected()
+    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
 
 def classify(load=False):
     if load:
@@ -164,6 +167,10 @@ def map(type:str):
             gdf.plot(column='Margin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Margin')
             plt.show()
+        case 'R_Margin':
+            gdf.plot(column='R_Margin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            plt.title('Relative Margin')
+            plt.show()
         case 'MinorityPct':
             gdf.plot(column='MinorityPct', cmap='Greys', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('MinorityPct')
@@ -187,7 +194,10 @@ def map(type:str):
 def web_map(type:str):
     match type:
         case 'Margin':
-            map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=10, legend_kwds=dict(colorbar=False))
+            map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=8, legend_kwds=dict(colorbar=False))
+            map.show_in_browser()
+        case 'R_Margin':
+            map = gdf.explore(column='R_Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=8, legend_kwds=dict(colorbar=False))
             map.show_in_browser()
         case 'MinorityPct':
             map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True, tiles="CartoDB positron")

@@ -84,7 +84,7 @@ def shifter(groups:list[str], vals:list[float]):
 def stats():
     if data != []:
         d_stats = {}
-        total = 0
+        total, relD = 0, 0
         env_ = env()
         n = len(data)
         base = n * (.5 + env_)
@@ -92,15 +92,18 @@ def stats():
             total += d.Expected
             d_stats[d.Class] = d_stats.get(d.Class, 0) + 1
             d_stats[d.Majority] = d_stats.get(d.Majority, 0) + 1
+            if d.Margin > env_:
+                relD += 1
         diff = (total - base) / n
 
         print(f"Expected Value: {total}")
-        print(f'Seat %: {(total / len(data)):.2%}')
+        print(f'Seat %: {(total / n):.2%}')
         print(f"D_Safe: {d_stats.get('D', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R: {d_stats.get('R_Safe', 0)}")
         print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
         print(f'Environment: {env_:2%}')
         median()
         print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
+        print(f'D Above Mean: {relD}, R Above Mean: {n - relD}')
 
 def median():
     if data != []:
