@@ -69,6 +69,7 @@ def stats():
 def reset():
     gdf['Margin'] = gdf['DemPct'] - gdf['RepPct']
     gdf['Swing'] = 0.0
+    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
 
 def filter(selections: set, class_: set, details: bool):
     filtered = gdf[gdf['Majority'].isin(selections)]
@@ -112,7 +113,7 @@ def shifter(groups:list[str], vals:list[float], print_=True):
             shift(vals[i], j, groups[i])
     if print_:
         print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}, Environment: {env:.2%}')
-        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {env:.2%}')
+        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {gdf['Margin'].mean():.2%}')
     classify()
     setExpected()
     gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()

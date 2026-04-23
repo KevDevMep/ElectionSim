@@ -170,6 +170,15 @@ def advanced():
     else:
         print('File is not loaded')
 
+def equalize():
+    if loaded.get():
+        if fileType.get():
+            B.shifter([''], [-B.gdf['Margin'].mean()])
+        else:
+            print('Geojson Only')
+    else:
+        print('File not loaded')
+
 root = tk.Tk()
 root.config(background='skyblue')
 root.title('Election Simulator')
@@ -223,8 +232,9 @@ tk.Spinbox(root, textvariable=trails, from_=1, to=10000).grid(row=5,column=1)
 tk.Button(root, text='Sim', command=simulator).grid(row=5,column=2)
 tk.Button(root, text='Stats', command=stats).grid(row=6,column=1)
 tk.Button(root, text='Reset', command=reset).grid(row=7,column=1)
-tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=7, column=2)
-tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=8, column=2)
+tk.Button(root, text='Equalize', command=equalize).grid(row=7,column=2)
+tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=8, column=2)
+tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=9, column=2)
 tk.Label(root, text='FileType').grid(row=8, column=1)
 tk.Radiobutton(root, text='Geojson', variable=fileType, value=True).grid(row=9, column=1)
 tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=10, column=1)
