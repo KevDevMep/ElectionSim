@@ -2,13 +2,13 @@ import pandas as pd
 
 df = pd.DataFrame()
 
-def shifter(shift: int):
+def shifter(shift: int, senBefore: int, govBefore: int):
     print('Before:')
-    stats(28, 20)
+    stats(senBefore, govBefore)
     for i in range(len(df)):
         df.loc[i, 'Margin'] = min(max(df.loc[i, 'Margin'] + shift, -100), 100)
     print('After:')
-    stats(28, 20)
+    stats(senBefore, govBefore)
 
 def stats(senBefore: int, govBefore: int):
     dPres = df[(df['Type'] == 'Pres') & (df['Margin'] > 0.0)]['EV'].sum()
