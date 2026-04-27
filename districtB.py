@@ -31,13 +31,15 @@ def setExpected(load=False):
     for i in range(len(gdf)):
         gdf.loc[i, 'Expected'] = expected(gdf['Margin'][i])
 
+def adjust(load=False):
+    setExpected(load)
+    classify(load)
+    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
+
 def loading():
     gdf['id'] = [i + 1 for i in range(len(gdf))]
     majority()
-    reset()
-    setExpected(True)
-    classify(True)
-    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
+    reset(True)
 
 def comp():
     n = len(gdf)
@@ -66,10 +68,10 @@ def stats():
     prop()
     comp()
 
-def reset():
+def reset(load=False):
     gdf['Margin'] = gdf['DemPct'] - gdf['RepPct']
     gdf['Swing'] = 0.0
-    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
+    adjust(load)
 
 def filter(selections: set, class_: set, details: bool):
     filtered = gdf[gdf['Majority'].isin(selections)]
@@ -114,9 +116,7 @@ def shifter(groups:list[str], vals:list[float], print_=True):
     if print_:
         print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}, Environment: {env:.2%}')
         print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {gdf['Margin'].mean():.2%}')
-    classify()
-    setExpected()
-    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
+    adjust()
 
 def classify(load=False):
     if load:
