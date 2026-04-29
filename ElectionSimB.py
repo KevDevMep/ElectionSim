@@ -181,6 +181,32 @@ def equalize():
     else:
         print('File not loaded')
 
+def selectNone():
+    white.set('')
+    black.set('')
+    hispanic.set('')
+    asian.set('')
+    native.set('')
+    pacific.set('')
+    minority.set('')
+    dem.set('')
+    demComp.set('')
+    rep.set('')
+    repComp.set('')
+
+def selectAll():
+    white.set('White')
+    black.set('Black')
+    hispanic.set('Hispanic')
+    asian.set('Asian')
+    native.set('Native')
+    pacific.set('Pacific')
+    minority.set('Minority')
+    dem.set('D')
+    demComp.set('D_Comp')
+    rep.set('R')
+    repComp.set('R_Comp')
+
 root = tk.Tk()
 root.config(background='skyblue')
 root.title('Election Simulator')
@@ -241,6 +267,9 @@ tk.Label(root, text='FileType').grid(row=8, column=1)
 tk.Radiobutton(root, text='Geo', variable=fileType, value=True).grid(row=9, column=1)
 tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=10, column=1)
 tk.Button(root, text='Advanced', command=advanced).grid(row=6,column=2)
+tk.Button(root, text='Select All', command=selectAll).grid(row=12, column=1)
+tk.Button(root, text='Select None', command=selectNone).grid(row=12, column=2)
+
 
 # Shifting Section
 tk.Label(root, text='Shifting').grid(row=0,column=0)
@@ -275,6 +304,7 @@ tk.Checkbutton(root, variable=demComp, text='Dem Comp', onvalue='D_Comp', offval
 tk.Checkbutton(root, variable=repComp, text='Rep Comp', onvalue='R_Comp', offvalue='').grid(row=11, column=3)
 tk.Button(root, text='Filter', command=filter).grid(row=12, column=3)
 
+
 # Mapping Section
 tk.Label(root, text='Mapping').grid(row=0, column=4)
 tk.Radiobutton(root, text='Margin', variable=mapType, value='Margin').grid(row=1, column=4)
@@ -285,13 +315,15 @@ tk.Radiobutton(root, text='Swing', variable=mapType, value='Swing').grid(row=5, 
 tk.Radiobutton(root, text='Relative Margin', variable=mapType, value='R_Margin').grid(row=6, column=4)
 tk.Button(root, text='Map', command=map).grid(row=7, column=4)
 tk.Button(root, text='Web Map', command=web_map).grid(row=8, column=4)
-tk.Label(root, text='Export Type').grid(row=9, column=4)
-tk.Radiobutton(root, variable=exportType, text='Geojson', value='Geojson').grid(row=10, column=4)
-tk.Radiobutton(root, variable=exportType, text='Shapefile', value='Shapefile').grid(row=11, column=4)
-tk.Radiobutton(root, variable=exportType, text='GeoPackage', value='GeoPackage').grid(row=12, column=4)
-tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=13, column=4)
-tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=14, column=4)
-tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=15, column=4)
-tk.Button(root, text='Export', command=export).grid(row=16,column=4)
+
+# Export Section
+tk.Label(root, text='Export Type').grid(row=0, column=5)
+tk.Radiobutton(root, variable=exportType, text='Geojson', value='Geojson').grid(row=1, column=5)
+tk.Radiobutton(root, variable=exportType, text='Shapefile', value='Shapefile').grid(row=2, column=5)
+tk.Radiobutton(root, variable=exportType, text='GeoPackage', value='GeoPackage').grid(row=3, column=5)
+tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=4, column=5)
+tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=5, column=5)
+tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=6, column=5)
+tk.Button(root, text='Export', command=export).grid(row=7,column=5)
 
 root.mainloop()
