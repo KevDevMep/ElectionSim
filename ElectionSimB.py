@@ -80,6 +80,8 @@ def export():
                         B.gdf.to_file('Export.geojson', use_arrow=True, driver='GeoJson')
                     case 'Shapefile':
                         B.gdf.to_file('Export.shp', use_arrow=True)
+                    case 'Geo Package':
+                        B.gdf.to_file('Export.gpkg', use_arrow=True, driver='GPKG')
                     case 'CSV':
                         map.to_csv('Export.csv')
                     case 'Json':
@@ -218,7 +220,7 @@ to7 = tk.IntVar(value=100)
 trails = tk.IntVar(value=1)
 exportType = tk.StringVar(value='GeoJson')
 base = tk.DoubleVar(value=0.0)
-fileType = tk.BooleanVar(value=True) # True = GeoJson, False = CSV
+fileType = tk.BooleanVar(value=True) # True = Geo, False = CSV
 
 # Middle Section
 tk.Label(root, text='File').grid(row=0,column=1)
@@ -236,7 +238,7 @@ tk.Button(root, text='Equalize', command=equalize).grid(row=7,column=2)
 tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=8, column=2)
 tk.Checkbutton(root, variable=details, text='Details', onvalue=True, offvalue=False).grid(row=9, column=2)
 tk.Label(root, text='FileType').grid(row=8, column=1)
-tk.Radiobutton(root, text='Geojson', variable=fileType, value=True).grid(row=9, column=1)
+tk.Radiobutton(root, text='Geo', variable=fileType, value=True).grid(row=9, column=1)
 tk.Radiobutton(root, text='CSV', variable=fileType, value=False).grid(row=10, column=1)
 tk.Button(root, text='Advanced', command=advanced).grid(row=6,column=2)
 
@@ -286,9 +288,10 @@ tk.Button(root, text='Web Map', command=web_map).grid(row=8, column=4)
 tk.Label(root, text='Export Type').grid(row=9, column=4)
 tk.Radiobutton(root, variable=exportType, text='Geojson', value='Geojson').grid(row=10, column=4)
 tk.Radiobutton(root, variable=exportType, text='Shapefile', value='Shapefile').grid(row=11, column=4)
-tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=12, column=4)
-tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=13, column=4)
-tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=14, column=4)
-tk.Button(root, text='Export', command=export).grid(row=15,column=4)
+tk.Radiobutton(root, variable=exportType, text='GeoPackage', value='GeoPackage').grid(row=12, column=4)
+tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=13, column=4)
+tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=14, column=4)
+tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=15, column=4)
+tk.Button(root, text='Export', command=export).grid(row=16,column=4)
 
 root.mainloop()
