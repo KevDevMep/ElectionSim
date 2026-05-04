@@ -79,7 +79,6 @@ def shifter(groups:list[str], vals:list[float]):
             for d in data:
                 d.shift(vals[i], groups[i])
         adjust()
-    
 
 def stats():
     if data != []:
@@ -116,9 +115,9 @@ def reset():
         for d in data:
             d.reset()
 
-def export():
+def export(exportName: str):
     if data != []:
-        with open('Adjusted.csv', 'w', newline='') as csvfile:
+        with open(f'{exportName}.csv', 'w', newline='') as csvfile:
             fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct', 'Class']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()

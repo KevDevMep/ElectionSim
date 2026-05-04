@@ -26,6 +26,9 @@ def majority():
             gdf.loc[i, 'Majority'] = "Minority"
 
 def setExpected(load=False):
+    if safe_point == 0:
+        print('Safe Point can not 0')
+        pass
     if load:
         gdf['Expected'] = 0.0
     for i in range(len(gdf)):
@@ -160,7 +163,6 @@ def simulator(nTrails: int):
     plt.ylabel('Count')
     plt.title('Simulator Results')
     plt.show()
-    pass
 
 def map(type:str):
     match type:
@@ -190,7 +192,6 @@ def map(type:str):
             plt.show()
         case _:
             print('Make a Selection')
-    pass
 
 def web_map(type:str):
     match type:
@@ -214,4 +215,3 @@ def web_map(type:str):
             map.show_in_browser()
         case _:
             print('Make a Selection')
-    pass
