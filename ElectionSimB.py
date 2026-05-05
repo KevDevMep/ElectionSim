@@ -75,7 +75,7 @@ def export():
     elif loaded.get():
         try:
             if fileType.get():
-                map = B.gdf.drop(columns=['geometry', 'opacity', 'color'])
+                map = B.gdf.drop(columns=['geometry'])
                 match exportType.get():
                     case 'GeoJson':
                         B.gdf.to_file(f'{exportName.get().strip()}.geojson', use_arrow=True, driver='GeoJson')

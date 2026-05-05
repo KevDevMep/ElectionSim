@@ -80,7 +80,7 @@ def filter(selections: set, class_: set, details: bool):
     filtered = gdf[gdf['Majority'].isin(selections)]
     filtered = filtered[filtered['Class'].isin(class_)]
     if details:
-        print(filtered.drop(columns=['geometry', 'opacity', 'color']))
+        print(filtered.drop(columns=['geometry']))
     print(f'Total: {len(filtered)}')
 
 def shift(shift_amount:float, index: int, group:str):
