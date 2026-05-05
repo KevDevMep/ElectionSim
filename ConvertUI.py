@@ -26,6 +26,7 @@ def majority():
     if loaded.get():
         try:
             C.majority()
+            print('Majority')
         except:
             print('Error')
     else:
@@ -41,6 +42,12 @@ def drop():
                 print('Error')
         else:
             print('Col can not be empty')
+    else:
+        print('File not Loaded')
+
+def columns():
+    if loaded.get():
+        print(C.gdf.columns)
     else:
         print('File not Loaded')
     
@@ -73,5 +80,6 @@ tk.Button(root, text='Convert', command=convert).grid(row=7, column=1)
 tk.Label(root, text='Col').grid(row=0, column=2)
 tk.Entry(root, textvariable=col).grid(row=1, column=2)
 tk.Button(root, text='Drop', command=drop).grid(row=2, column=2)
+tk.Button(root, text='Columns', command=columns).grid(row=4, column=2)
 
 root.mainloop()
