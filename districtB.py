@@ -25,7 +25,7 @@ def majority():
         else:
             gdf.loc[i, 'Majority'] = "Minority"
 
-def setExpected(load=False):
+def setExpected(load: bool=False):
     if safe_point == 0:
         print('Safe Point can not 0')
         pass
@@ -34,7 +34,7 @@ def setExpected(load=False):
     for i in range(len(gdf)):
         gdf.loc[i, 'Expected'] = expected(gdf['Margin'][i])
 
-def adjust(load=False):
+def adjust(load: bool=False):
     setExpected(load)
     classify(load)
     gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
@@ -73,14 +73,13 @@ def stats():
 
 def reset(load=False):
     gdf['Margin'] = gdf['DemPct'] - gdf['RepPct']
-    gdf['Swing'] = 0.0
     adjust(load)
 
 def filter(selections: set, class_: set, details: bool):
     filtered = gdf[gdf['Majority'].isin(selections)]
     filtered = filtered[filtered['Class'].isin(class_)]
     if details:
-        print(filtered.drop(columns=['geometry']))
+        print(filtered.drop(columns=['geometry', 'Class', 'Expected', 'R_Margin', 'DemPct', 'RepPct']))
     print(f'Total: {len(filtered)}')
 
 def shift(shift_amount:float, index: int, group:str):
@@ -103,7 +102,6 @@ def shift(shift_amount:float, index: int, group:str):
                 ajusted *= 1
         gdf.loc[index, 'Margin'] = max(min((gdf['Margin'][index] + ajusted), 1), -1)
         gdf.loc[index, 'Expected'] = expected(gdf['Margin'][index])
-        gdf.loc[index, 'Swing'] = gdf['Swing'][index] + ajusted
 
 def shifter(groups:list[str], vals:list[float], print_=True):
     if print_:
@@ -186,10 +184,6 @@ def map(type:str):
             gdf.plot(column='RepPct', cmap='Reds', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('RepPct')
             plt.show()
-        case 'Swing':
-            gdf.plot(column='Swing', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
-            plt.title('Swing')
-            plt.show()
         case _:
             print('Make a Selection')
 
@@ -209,9 +203,6 @@ def web_map(type:str):
             map.show_in_browser()
         case 'RepPct':
             map = gdf.explore(column='RepPct', cmap='Reds', legend=True, tiles="CartoDB positron")
-            map.show_in_browser()
-        case 'Swing':
-            map = gdf.explore(column='Swing', cmap='RdBu', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case _:
             print('Make a Selection')

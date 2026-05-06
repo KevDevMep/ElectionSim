@@ -2,7 +2,7 @@ import pandas as pd
 
 df = pd.DataFrame()
 
-def shifter(shift: int, senBefore: int, govBefore: int):
+def shifter(shift: float, senBefore: int, govBefore: int):
     print('Before:')
     stats(senBefore, govBefore)
     for i in range(len(df)):

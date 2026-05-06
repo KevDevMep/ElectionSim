@@ -219,9 +219,9 @@ def drop():
                 except:
                     print('Error')
             else:
-                print('Not available for CSV')
+                print('Col is empty')
         else:
-            print()
+            print('Not available for CSV')
     else:
         print('File not Loaded')
 
@@ -339,9 +339,12 @@ tk.Radiobutton(root, text='Relative Margin', variable=mapType, value='R_Margin')
 tk.Radiobutton(root, text='Minority', variable=mapType, value='MinorityPct').grid(row=3, column=4)
 tk.Radiobutton(root, text='Dem', variable=mapType, value='DemPct').grid(row=4, column=4)
 tk.Radiobutton(root, text='Rep', variable=mapType, value='RepPct').grid(row=5, column=4)
-tk.Radiobutton(root, text='Swing', variable=mapType, value='Swing').grid(row=6, column=4)
-tk.Button(root, text='Map', command=map).grid(row=7, column=4)
-tk.Button(root, text='Web Map', command=web_map).grid(row=8, column=4)
+tk.Button(root, text='Map', command=map).grid(row=6, column=4)
+tk.Button(root, text='Web Map', command=web_map).grid(row=7, column=4)
+tk.Label(root, text='Col').grid(row=9, column=4)
+tk.Entry(root, textvariable=col).grid(row=10, column=4)
+tk.Button(root, text='Drop', command=drop).grid(row=11, column=4)
+tk.Button(root, text='Columns', command=columns).grid(row=12, column=4)
 
 # Export Section
 tk.Label(root, text='Export Type').grid(row=0, column=5)
@@ -354,9 +357,5 @@ tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=6,
 tk.Button(root, text='Export', command=export).grid(row=7,column=5)
 tk.Label(root, text='Export Tag').grid(row=9, column=5)
 tk.Entry(root, textvariable=exportTag).grid(row=10, column=5)
-tk.Label(root, text='Col').grid(row=11, column=5)
-tk.Entry(root, textvariable=col).grid(row=12, column=5)
-tk.Button(root, text='Drop', command=drop).grid(row=13, column=5)
-tk.Button(root, text='Columns', command=columns).grid(row=14, column=5)
 
 root.mainloop()

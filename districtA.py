@@ -17,8 +17,8 @@ def load(file:str):
         districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         i = 0
         for row in districtreader:
-            margin = float(row['DemPct']) - float(row['RepPct'])
-            d = District.District(i + 1, margin, float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+            d = District.District(i + 1, float(row['DemPct']),float(row['RepPct']) , float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+            d.reset()
             d.expected(safe_point)
             d.majority()
             d.classify(safe_point)
@@ -57,7 +57,7 @@ def simulator(trails:int):
                     wins += 1
 
         with open('District Results.csv', 'w', newline='') as csvfile:
-            fieldnames = ['d_wins', 'r_wins', 'CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
+            fieldnames = ['d_wins', 'r_wins', 'CD', 'Margin', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for d in districts:
@@ -97,7 +97,7 @@ def stats():
 
         print(f"Expected Value: {total:.2f}")
         print(f'Seat %: {(total / n):.2%}')
-        print(f"D_Safe: {d_stats.get('D', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R: {d_stats.get('R_Safe', 0)}")
+        print(f"D_Safe: {d_stats.get('D', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R: {d_stats.get('R', 0)}")
         print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
         print(f'Environment: {env_:.2%}')
         median()
@@ -118,7 +118,7 @@ def reset():
 def export(exportName: str):
     if data != []:
         with open(f'{exportName}.csv', 'w', newline='') as csvfile:
-            fieldnames = ['CD', 'Margin', 'Swing', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct', 'Class']
+            fieldnames = ['CD', 'Margin', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
             for d in data:
