@@ -70,7 +70,7 @@ def reset():
         print('File is not loaded')
 
 def export():
-    if exportName.get().strip() == '':
+    if exportTag.get().strip() == '':
         print('Export Name can not be empty')
     elif loaded.get():
         try:
@@ -78,19 +78,19 @@ def export():
                 map = B.gdf.drop(columns=['geometry'])
                 match exportType.get():
                     case 'GeoJson':
-                        B.gdf.to_file(f'{exportName.get().strip()}.geojson', use_arrow=True, driver='GeoJson')
+                        B.gdf.to_file(f'{exportTag.get().strip()}.geojson', use_arrow=True, driver='GeoJson')
                     case 'Shapefile':
-                        B.gdf.to_file(f'{exportName.get().strip()}.shp', use_arrow=True)
+                        B.gdf.to_file(f'{exportTag.get().strip()}.shp', use_arrow=True)
                     case 'Geo Package':
-                        B.gdf.to_file(f'{exportName.get().strip()}.gpkg', use_arrow=True, driver='GPKG')
+                        B.gdf.to_file(f'{exportTag.get().strip()}.gpkg', use_arrow=True, driver='GPKG')
                     case 'CSV':
-                        map.to_csv(f'{exportName.get().strip()}.csv')
+                        map.to_csv(f'{exportTag.get().strip()}.csv')
                     case 'Json':
-                        map.to_json(f'{exportName.get().strip()}.json')
+                        map.to_json(f'{exportTag.get().strip()}.json')
                     case 'HTML':
-                        map.to_html(f'{exportName.get().strip()}.html')
+                        map.to_html(f'{exportTag.get().strip()}.html')
             else:
-                A.export(exportName.get().strip())
+                A.export(exportTag.get().strip())
             print('Exported')
         except:
             print('Export Error')
@@ -209,6 +209,31 @@ def selectAll():
     rep.set('R')
     repComp.set('R_Comp')
 
+def drop():
+    if loaded.get():
+        if fileType.get():
+            if col.get().strip() != '':
+                try:
+                    B.gdf = B.gdf.drop(columns=[col.get().strip()])
+                    print(f'{col.get().strip()} Dropped')
+                except:
+                    print('Error')
+            else:
+                print('Not available for CSV')
+        else:
+            print()
+    else:
+        print('File not Loaded')
+
+def columns():
+    if loaded.get():
+        if fileType.get():
+            print(B.gdf.columns)
+        else:
+            print('Not available for CSV')
+    else:
+        print('File not Loaded')
+
 root = tk.Tk()
 root.config(background='skyblue')
 root.title('Election Simulator')
@@ -231,8 +256,9 @@ rep = tk.StringVar()
 demComp = tk.StringVar()
 repComp = tk.StringVar()
 exportType = tk.StringVar(value='GeoJson')
-exportName = tk.StringVar(value='Export')
+exportTag = tk.StringVar(value='Export')
 mapType = tk.StringVar()
+col = tk.StringVar()
 safe_point = tk.IntVar(value=15)
 a = tk.IntVar(value=0)
 b = tk.IntVar(value=0)
@@ -326,7 +352,11 @@ tk.Radiobutton(root, variable=exportType, text='CSV', value='CSV').grid(row=4, c
 tk.Radiobutton(root, variable=exportType, text='Json', value='Json').grid(row=5, column=5)
 tk.Radiobutton(root, variable=exportType, text='HTML', value='HTML').grid(row=6, column=5)
 tk.Button(root, text='Export', command=export).grid(row=7,column=5)
-tk.Label(root, text='Export Name').grid(row=9, column=5)
-tk.Entry(root, textvariable=exportName).grid(row=10, column=5)
+tk.Label(root, text='Export Tag').grid(row=9, column=5)
+tk.Entry(root, textvariable=exportTag).grid(row=10, column=5)
+tk.Label(root, text='Col').grid(row=11, column=5)
+tk.Entry(root, textvariable=col).grid(row=12, column=5)
+tk.Button(root, text='Drop', command=drop).grid(row=13, column=5)
+tk.Button(root, text='Columns', command=columns).grid(row=14, column=5)
 
 root.mainloop()
