@@ -23,5 +23,52 @@ def stats(senBefore: int, govBefore: int):
     print(f'Gov: ({govBefore + dGov}, {50 - (govBefore + dGov)})')
 
 def reset():
-    for i in range(len(df)):
-        df.loc[i, 'Margin'] = df.loc[i, 'DemPct'] - df.loc[i, 'RepPct']
+    df['Margin'] = df['DemPct'] - df['RepPct']
+
+def pathToVictory():
+    pres = df[df['Type']=='Pres']
+    if len(pres) == 0:
+        print('No Pres')
+    else:
+        demEV = pres[pres['Margin'] > 0]['EV'].sum()
+        totalEV = pres['EV'].sum()
+        
+        if demEV < (totalEV / 2):
+            rep = pres[pres['Margin'] < 0].sort_values(by=['Margin'], ascending=False)
+            n = len(rep)
+            for i in range(n):
+                print(rep.iloc[i])
+                demEV += rep.iloc[i]['EV']
+                if demEV > (totalEV / 2):
+                    break
+        else:
+            dem = pres[pres['Margin'] > 0].sort_values(by=['Margin'])
+            n = len(dem)
+            for i in range(n):
+                print(dem.iloc[i])
+                demEV -= dem.iloc[i]['EV']
+                if demEV < (totalEV / 2):
+                    break
+
+def senPathToVictory(senBefore: int):
+    sen = df[df['Type']=='Senate']
+    if len(sen) == 0:
+        print('No Pres')
+    else:
+        demEV = senBefore + sen[sen['Margin'] > 0]['EV'].sum()
+        if demEV < 50:
+            rep = sen[sen['Margin'] < 0].sort_values(by=['Margin'], ascending=False)
+            n = len(rep)
+            for i in range(n):
+                print(rep.iloc[i])
+                demEV += 1
+                if demEV == 50:
+                    break
+        else:
+            dem = sen[sen['Margin'] > 0].sort_values(by=['Margin'])
+            n = len(dem)
+            for i in range(n):
+                if demEV == 50:
+                    break
+                print(dem.iloc[i])
+                demEV -= 1

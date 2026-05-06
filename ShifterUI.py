@@ -42,6 +42,18 @@ def senate():
 def gov():
     print(S.df[S.df['Type']=='Gov'])
 
+def pathToVictory():
+    if loaded.get():
+        S.pathToVictory()
+    else:
+        print('File not loaded')
+
+def senPathToVictory():
+    if loaded.get():
+        S.senPathToVictory(senBefore.get())
+    else:
+        print('File not loaded')
+
 root = tk.Tk()
 root.title('Shifter')
 filename = tk.StringVar()
@@ -67,4 +79,6 @@ tk.Button(root, text='President', command=pres).grid(row=0, column=3)
 tk.Button(root, text='House', command=house).grid(row=1, column=3)
 tk.Button(root, text='Senate', command=senate).grid(row=2, column=3)
 tk.Button(root, text='Governor', command=gov).grid(row=3, column=3)
+tk.Button(root, text='Path To Victory', command=pathToVictory).grid(row=4, column=3)
+tk.Button(root, text='Senate Path To Victory', command=senPathToVictory).grid(row=5, column=3)
 root.mainloop()
