@@ -95,11 +95,11 @@ def stats():
                 relD += 1
         diff = (total - base) / n
 
-        print(f"Expected Value: {total}")
+        print(f"Expected Value: {total:.2f}")
         print(f'Seat %: {(total / n):.2%}')
         print(f"D_Safe: {d_stats.get('D', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R: {d_stats.get('R_Safe', 0)}")
         print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
-        print(f'Environment: {env_:2%}')
+        print(f'Environment: {env_:.2%}')
         median()
         print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
         print(f'D Above Mean: {relD}, R Above Mean: {n - relD}')

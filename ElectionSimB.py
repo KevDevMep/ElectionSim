@@ -111,11 +111,12 @@ def filter():
 def setSafePoint():
     if fileType.get():
         B.safe_point = safe_point.get() / 100.0
-        B.setExpected()
-        B.classify()
+        if loaded.get():
+            B.adjust(False)
     else:
         A.safe_point = safe_point.get() / 100.0
-        A.setSafePoint()
+        if loaded.get():
+            A.adjust()
     print('Set')
 
 def map():

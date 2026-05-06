@@ -50,25 +50,46 @@ def pathToVictory():
                 if demEV < (totalEV / 2):
                     break
 
-def senPathToVictory(senBefore: int):
+def senGoTo(senBefore: int, target: int=50):
     sen = df[df['Type']=='Senate']
     if len(sen) == 0:
-        print('No Pres')
+        print('No Senate')
     else:
         demEV = senBefore + sen[sen['Margin'] > 0]['EV'].sum()
-        if demEV < 50:
+        if demEV < target:
             rep = sen[sen['Margin'] < 0].sort_values(by=['Margin'], ascending=False)
             n = len(rep)
             for i in range(n):
                 print(rep.iloc[i])
                 demEV += 1
-                if demEV == 50:
+                if demEV == target:
                     break
         else:
             dem = sen[sen['Margin'] > 0].sort_values(by=['Margin'])
             n = len(dem)
             for i in range(n):
-                if demEV == 50:
+                if demEV == target:
                     break
                 print(dem.iloc[i])
                 demEV -= 1
+
+def comp():
+    pres = df[df['Type']=='Pres']
+    if len(pres) != 0:
+        print('Pres:')
+        print(pres[abs(pres['Margin']) < 5].sort_values(by=['Margin']))
+
+    sen = df[df['Type']=='Senate']
+    if len(sen) != 0:
+        print('Senate:')
+        print(sen[abs(sen['Margin']) < 5].sort_values(by=['Margin']))
+
+    house = df[df['Type']=='House']
+    if len(house) != 0:
+        print('House:')
+        print(house[abs(house['Margin']) < 5].sort_values(by=['Margin']))
+    
+    gov = df[df['Type']=='Gov']
+    if len(gov) != 0:
+        print('Gov:')
+        print(gov[abs(gov['Margin']) < 5].sort_values(by=['Margin']))
