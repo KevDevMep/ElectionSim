@@ -96,6 +96,14 @@ def preset():
             filename.set('Election Data 12.csv')
             senBefore.set(29)
             govBefore.set(13)
+        case '2010':
+            filename.set('Election Data 10.csv')
+            senBefore.set(39)
+            govBefore.set(7)
+        case '2008':
+            filename.set('Election Data 08.csv')
+            senBefore.set(39)
+            govBefore.set(22)
         case _:
             print('Not a year with a preset')
 
@@ -105,10 +113,17 @@ def comp():
     else:
         print('File not loaded')
 
+def search():
+    if loaded.get():
+        print(S.df[S.df['id'] == name.get()])
+    else:
+        print('File not loaded')
+
 root = tk.Tk()
 root.title('Shifter')
 year = tk.StringVar()
 filename = tk.StringVar()
+name = tk.StringVar()
 loaded = tk.BooleanVar()
 shift = tk.IntVar()
 senBefore = tk.IntVar()
@@ -143,5 +158,8 @@ tk.Label(root, text='Year').grid(row=0, column=4)
 tk.Entry(root, textvariable=year).grid(row=1, column=4)
 tk.Button(root, text='Historical Preset', command=preset).grid(row=2, column=4)
 tk.Button(root, text='Comp', command=comp).grid(row=3, column=4)
+tk.Label(root, text='Name').grid(row=4, column=4)
+tk.Entry(root, textvariable=name).grid(row=5, column=4)
+tk.Button(root, text='Search',command=search).grid(row=6, column=4)
 
 root.mainloop()
