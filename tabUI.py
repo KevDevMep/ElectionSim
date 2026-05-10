@@ -18,7 +18,7 @@ def export():
     if set_.get():
         if tag.get().strip():
             try:
-                T.toForm(tag.get().strip(), cuttoff.get())
+                T.toForm(tag.get().strip(), floor.get())
                 T.toFormB(tag.get().strip())
                 T.df.drop(columns=['district', 'state_po']).to_csv(f'house_{year.get()}.csv')
                 print('Export')
@@ -53,7 +53,7 @@ def merge():
 
 root = tk.Tk()
 root.title('Tab')
-cuttoff = tk.DoubleVar(value=10.0)
+floor = tk.DoubleVar(value=10.0)
 tag = tk.StringVar(value='Export')
 f1 = tk.StringVar()
 f2 = tk.StringVar()
@@ -66,8 +66,8 @@ tk.Spinbox(root, textvariable=year, from_=1976, to_=2024, increment=2).grid(row=
 tk.Button(root, text='Set', command=yearSet).grid(row=1, column=1)
 tk.Label(root, text='Tag').grid(row=2, column=0)
 tk.Entry(root, textvariable=tag).grid(row=3, column=0)
-tk.Label(root, text='Cuttoff').grid(row=2, column=1)
-tk.Spinbox(root, textvariable=cuttoff, from_=0, to_=10).grid(row=3, column=1)
+tk.Label(root, text='Floor').grid(row=2, column=1)
+tk.Spinbox(root, textvariable=floor, from_=0, to_=10).grid(row=3, column=1)
 tk.Button(root, text='Export', command=export).grid(row=4, column=0)
 tk.Checkbutton(root, text='Set', variable=set_, onvalue=True, offvalue=False, state='disabled').grid(row=4, column=1)
 tk.Checkbutton(root, text='Loaded', variable=loaded, onvalue=True, offvalue=False, state='disabled').grid(row=5, column=1)

@@ -115,9 +115,9 @@ def reset():
         for d in data:
             d.reset()
 
-def export(exportName: str):
+def export(exportTag: str):
     if data != []:
-        with open(f'{exportName}.csv', 'w', newline='') as csvfile:
+        with open(f'{exportTag}.csv', 'w', newline='') as csvfile:
             fieldnames = ['CD', 'Margin', 'Majority', 'WhitePct', 'MinorityPct', 'BlackPct', 'HispanicPct', 'AsianPct', 'NativePct', 'PacificPct']
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()

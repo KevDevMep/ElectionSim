@@ -6,7 +6,8 @@ def shifter(shift: float, senBefore: int, govBefore: int):
     print('Before:')
     stats(senBefore, govBefore)
     for i in range(len(df)):
-        df.loc[i, 'Margin'] = min(max(df.loc[i, 'Margin'] + shift, -100), 100)
+        if df.loc[i, 'DemPct'] != 0 and df.loc[i, 'RepPct'] != 0:
+            df.loc[i, 'Margin'] = min(max(df.loc[i, 'Margin'] + shift, -100), 100)
     print('After:')
     stats(senBefore, govBefore)
 

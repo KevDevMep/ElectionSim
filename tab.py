@@ -15,12 +15,10 @@ def setCD(df_: pd.DataFrame):
             df_.loc[i, 'CD'] = df_.loc[i, 'state_po'] + '-' + str(df_.loc[i, 'district'])
     return df_
 
-def toForm(tag: str, cutoff: float):
+def toForm(tag: str, floor: float):
     data, district = {}, {}
-    dfB = df[(df['Pct'] > cutoff) & (df['state_po'] != 'NY')]
-    print(dfB)
+    dfB = df[(df['Pct'] > floor) & (df['state_po'] != 'NY')]
     index = dfB.index
-    print(index)
     prev = dfB.loc[index[0], 'CD']
     for i in index:
         if dfB.loc[i, 'CD'] != prev:
@@ -51,7 +49,7 @@ def toFormB(tag: str):
     data[prev] = district
 
     dataDF = pd.DataFrame(data)
-    dataDF.transpose().to_csv(f'{tag}_NY.csv')
+    dataDF.to_csv(f'{tag}_NY.csv')
 
 def setUp(df_: pd.DataFrame, year: int):
     df_ = df_[(df_['year'] == year) & (df_['state_po'] != 'DC')].drop(columns=['state', 'state_fips', 'state_cen', 'state_ic', 'office', 'stage', 'runoff', 'special', 'writein', 'mode', 'unofficial', 'version', 'fusion_ticket']).dropna()
