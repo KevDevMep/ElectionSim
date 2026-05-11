@@ -37,7 +37,6 @@ def setExpected(load: bool=False):
 def adjust(load: bool=False):
     setExpected(load)
     classify(load)
-    gdf['R_Margin'] = gdf['Margin'] - gdf['Margin'].mean()
 
 def loading():
     gdf['id'] = [i + 1 for i in range(len(gdf))]
@@ -51,11 +50,11 @@ def comp():
     print(f'Competitveness: {((n - total) / n):.2%}')
 
 def prop():
-    n = len(gdf)
-    base = n * (.5 + gdf['Margin'].mean())
+    n, env = len(gdf), gdf['Margin'].mean()
+    base = n * (.5 + env)
     diff = (gdf['Expected'].sum() - base) / n
     print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
-    print(f'D Above Mean: {len(gdf[gdf['R_Margin'] > 0])}, R Above Mean: {len(gdf[gdf['R_Margin'] < 0])}')
+    print(f'D Above Mean: {len(gdf[gdf['Margin'] > env])}, R Above Mean: {len(gdf[gdf['Margin'] < env])}')
 
 def stats():
     print(f'Number of Districts: {len(gdf)}')
@@ -79,7 +78,7 @@ def filter(selections: set, class_: set, details: bool):
     filtered = gdf[gdf['Majority'].isin(selections)]
     filtered = filtered[filtered['Class'].isin(class_)]
     if details:
-        print(filtered.drop(columns=['geometry', 'Class', 'Expected', 'R_Margin', 'DemPct', 'RepPct']))
+        print(filtered.drop(columns=['geometry', 'Class', 'Expected', 'DemPct', 'RepPct']))
     print(f'Total: {len(filtered)}')
 
 def shift(shift_amount:float, index: int, group:str):
@@ -168,20 +167,20 @@ def map(type:str):
             gdf.plot(column='Margin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
             plt.title('Margin')
             plt.show()
-        case 'R_Margin':
-            gdf.plot(column='R_Margin', cmap='RdBu', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
-            plt.title('Relative Margin')
+        case 'White':
+            gdf.plot(column='WhitePct', cmap='gray', legend=True, legend_kwds={'label': 'White', 'orientation': 'horizontal'})
+            plt.title('White')
             plt.show()
         case 'MinorityPct':
-            gdf.plot(column='MinorityPct', cmap='Greys', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='MinorityPct', cmap='Greys', legend=True, legend_kwds={'label': 'Minority', 'orientation': 'horizontal'})
             plt.title('MinorityPct')
             plt.show()
         case 'DemPct':
-            gdf.plot(column='DemPct', cmap='Blues', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='DemPct', cmap='Blues', legend=True, legend_kwds={'label': 'Dem', 'orientation': 'horizontal'})
             plt.title('DemPct')
             plt.show()
         case 'RepPct':
-            gdf.plot(column='RepPct', cmap='Reds', legend=True, legend_kwds={'label': 'Margin', 'orientation': 'horizontal'})
+            gdf.plot(column='RepPct', cmap='Reds', legend=True, legend_kwds={'label': 'Rep', 'orientation': 'horizontal'})
             plt.title('RepPct')
             plt.show()
         case _:
@@ -192,8 +191,8 @@ def web_map(type:str):
         case 'Margin':
             map = gdf.explore(column='Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=8, legend_kwds=dict(colorbar=False))
             map.show_in_browser()
-        case 'R_Margin':
-            map = gdf.explore(column='R_Margin', cmap='RdBu', legend=True, tiles="CartoDB positron", scheme='equal_interval', k=8, legend_kwds=dict(colorbar=False))
+        case 'White':
+            map = gdf.explore(column='WhitePct', cmap='gray', legend=True, tiles="CartoDB positron")
             map.show_in_browser()
         case 'MinorityPct':
             map = gdf.explore(column='MinorityPct', cmap='Greys', legend=True, tiles="CartoDB positron")

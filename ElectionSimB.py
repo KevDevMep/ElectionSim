@@ -335,7 +335,7 @@ tk.Button(root, text='Filter', command=filter).grid(row=12, column=3)
 # Mapping Section
 tk.Label(root, text='Mapping').grid(row=0, column=4)
 tk.Radiobutton(root, text='Margin', variable=mapType, value='Margin').grid(row=1, column=4)
-tk.Radiobutton(root, text='Relative Margin', variable=mapType, value='R_Margin').grid(row=2, column=4)
+tk.Radiobutton(root, text='White', variable=mapType, value='White').grid(row=2, column=4)
 tk.Radiobutton(root, text='Minority', variable=mapType, value='MinorityPct').grid(row=3, column=4)
 tk.Radiobutton(root, text='Dem', variable=mapType, value='DemPct').grid(row=4, column=4)
 tk.Radiobutton(root, text='Rep', variable=mapType, value='RepPct').grid(row=5, column=4)
