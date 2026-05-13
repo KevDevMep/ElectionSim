@@ -3,7 +3,7 @@ import random as r
 import matplotlib.pyplot as plt
 import District
 
-safe_point = .15
+safe_point = .05
 data = []
 
 def expectedValue():
@@ -73,41 +73,50 @@ def simulator(trails:int):
         plt.title('Simulator Results')
         plt.show()
 
-def shifter(groups:list[str], vals:list[float]):
+def shifter(groups:list[str], vals:list[float], print_: bool=True):
+    if print_:
+        print('Before:')
+        stats(False)
     if data != []:
         for i in range(len(groups)):
             for d in data:
                 d.shift(vals[i], groups[i])
         adjust()
+    if print_:
+        print('After:')
+        stats(False)
 
-def stats():
+def stats(majority: bool=True):
     if data != []:
         d_stats = {}
-        total, relD = 0, 0
-        env_ = env()
-        n = len(data)
-        base = n * (.5 + env_)
+        total, relD, n, env_ = 0, 0, len(data), env()
         for d in data:
             total += d.Expected
             d_stats[d.Class] = d_stats.get(d.Class, 0) + 1
             d_stats[d.Majority] = d_stats.get(d.Majority, 0) + 1
             if d.Margin > env_:
                 relD += 1
-        diff = (total - base) / n
+        diff = (total / n) - (0.5 + env_)
 
-        print(f"Expected Value: {total:.2f}")
-        print(f'Seat %: {(total / n):.2%}')
-        print(f"D_Safe: {d_stats.get('D', 0)}, D_Comp: {d_stats.get('D_Comp', 0)}, R_Comp: {d_stats.get('R_Comp', 0)}, R: {d_stats.get('R', 0)}")
-        print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
+        if majority:
+            print(f'Number of Districts: {n}')
         print(f'Environment: {env_:.2%}')
+        print(f"Seat %: {(total / n):.2%}, Expected Value: {total:.2f}")
+        print(f"D: {d_stats.get('D', 0)}, Comp: {d_stats.get('Comp', 0)}, R: {d_stats.get('R', 0)}")
         median()
+        print('Min Seat:')
+        print(min(data, key=lambda n: n.Margin).to_string())
+        print('Max Seat:')
+        print(max(data, key=lambda n: n.Margin).to_string())
+        if majority:
+            print(f"White: {d_stats.get('White', 0)}, Black: {d_stats.get('Black', 0)}, Hispanic: {d_stats.get('Hispanic', 0)}, Asian: {d_stats.get('Asian', 0)}, Native: {d_stats.get('Native', 0)}, Pacific: {d_stats.get('Pacific', 0)}, Minority: {d_stats['Minority']}")
         print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
         print(f'D Above Mean: {relD}, R Above Mean: {n - relD}')
 
 def median():
     if data != []:
         sd = sorted(data, key=lambda n: n.Margin)
-        print('Median Seat: ')
+        print('Median Seat:')
         print(sd[len(data) // 2].to_string())
 
 def reset():

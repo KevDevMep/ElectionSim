@@ -3,7 +3,7 @@ import random as r
 import matplotlib.pyplot as plt
 import csv
 
-safe_point = .15
+safe_point = .05
 gdf = gp.GeoDataFrame()
 expected = lambda n: min(max((1 + (1 / safe_point) * n) / 2.0, 0.0), 1.0)
 
@@ -39,36 +39,27 @@ def adjust(load: bool=False):
     classify(load)
 
 def loading():
-    gdf['id'] = [i + 1 for i in range(len(gdf))]
     majority()
     reset(True)
 
-def comp():
-    n = len(gdf)
-    env = gdf['Margin'].mean()
-    total = sum(2 * abs(.5 - gdf['Expected'] + env))
-    print(f'Competitveness: {((n - total) / n):.2%}')
+def stats(majority: bool=True):
+    n, env, total = len(gdf), gdf['Margin'].mean(), gdf['Expected'].sum()
 
-def prop():
-    n, env = len(gdf), gdf['Margin'].mean()
-    base = n * (.5 + env)
-    diff = (gdf['Expected'].sum() - base) / n
-    print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
-    print(f'D Above Mean: {len(gdf[gdf['Margin'] > env])}, R Above Mean: {len(gdf[gdf['Margin'] < env])}')
-
-def stats():
-    print(f'Number of Districts: {len(gdf)}')
-    print(f'Expected Value: {gdf['Expected'].sum():.2f}')
-    print(f'Seat %: {(gdf['Expected'].sum() / len(gdf)):.2%}')
+    if majority:
+        print(f'Number of Districts: {n}')
+    print(f'Environment: {env:.2%}')
+    print(f'Seat %: {(total / n):.2%}, Expected Value: {total:.2f}')
     print(f'Median District Margin: {gdf['Margin'].median():.2%}')
     print(f'Min District Margin: {gdf['Margin'].min():.2%}')
     print(f'Max District Margin: {gdf['Margin'].max():.2%}')
-    print(f'Environment: {gdf['Margin'].mean():.2%}')
-    print(gdf['Majority'].value_counts())
-    print(gdf.groupby('Majority').agg({'Margin': ['mean', 'min', 'max']}))
     print(gdf['Class'].value_counts())
-    prop()
-    comp()
+    if majority:
+        print(gdf['Majority'].value_counts())
+        print(gdf.groupby('Majority').agg({'Margin': ['mean', 'min', 'max']}))
+    
+    diff = (total / n) - (.5 + env)
+    print(f'Proportionality: {1 - abs(diff):.2%}, Map Diff: {diff:.2%}')
+    print(f'D Above Mean: {len(gdf[gdf['Margin'] > env])}, R Above Mean: {len(gdf[gdf['Margin'] < env])}')
 
 def reset(load=False):
     gdf['Margin'] = gdf['DemPct'] - gdf['RepPct']
@@ -104,19 +95,15 @@ def shift(shift_amount:float, index: int, group:str):
 
 def shifter(groups:list[str], vals:list[float], print_=True):
     if print_:
-        median = gdf['Margin'].median()
-        expected = gdf['Expected'].sum()
-        min = gdf['Margin'].min()
-        max = gdf['Margin'].max()
-        seatPct = expected / len(gdf)
-        env = gdf['Margin'].mean()
+        print('Before:')
+        stats(False)
     for i in range(len(groups)):
         for j in range(len(gdf)):
             shift(vals[i], j, groups[i])
+        adjust()
     if print_:
-        print(f'Before, Median: {median:.2%}, Expected Value: {expected:.2f}, Seat %: {seatPct:.2%}, Min: {min:.2%}, Max: {max:.2%}, Environment: {env:.2%}')
-        print(f'After, Median: {gdf['Margin'].median():.2%}, Expected Value: {gdf['Expected'].sum():.2f}, Seat %: {gdf['Expected'].sum() / len(gdf):.2%} , Min: {gdf['Margin'].min():.2%}, Max: {gdf['Margin'].max():.2%}, Environment: {gdf['Margin'].mean():.2%}')
-    adjust()
+        print('After:')
+        stats(False)
 
 def classify(load=False):
     if load:
@@ -124,18 +111,16 @@ def classify(load=False):
     for i in range(len(gdf)):
         if gdf['Margin'][i] > safe_point:
             gdf.loc[i, 'Class'] = 'D'
-        elif gdf['Margin'][i] > 0:
-            gdf.loc[i, 'Class'] = 'D_Comp'
         elif gdf['Margin'][i] < -safe_point:
             gdf.loc[i, 'Class'] = 'R'
         else:
-            gdf.loc[i, 'Class'] = 'R_Comp'
+            gdf.loc[i, 'Class'] = 'Comp'
 
 def simulator(nTrails: int):
     seats = len(gdf)
     results = {}
     total, wins, d_safe = 0, 0, len(gdf[gdf['Class'] == 'D'])
-    comp = gdf[(gdf['Class'] == 'D_Comp') | (gdf['Class'] == 'R_Comp')]
+    comp = gdf[gdf['Class'] == 'Comp']
                     
     with open('Results.csv', 'w', newline='') as csvfile:
         fieldnames = ['trail', 'd_seats', 'r_seats', 'winner']

@@ -65,12 +65,10 @@ class District:
     def classify(self, safe_point: float):
         if self.Margin > safe_point:
             self.Class = 'D'
-        elif self.Margin > 0:
-            self.Class = 'D_Comp'
         elif self.Margin < -safe_point:
             self.Class = 'R'
         else:
-            self.Class = 'R_Comp'
+            self.Class = 'Comp'
 
     def reset(self):
         self.Margin = self.DemPct - self.RepPct
