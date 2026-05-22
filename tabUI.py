@@ -20,7 +20,7 @@ def export():
             try:
                 T.toForm(tag.get().strip(), floor.get())
                 T.toFormB(tag.get().strip())
-                T.df.drop(columns=['district', 'state_po']).to_csv(f'house_{year.get()}.csv')
+                T.df.to_csv(f'house_{year.get()}.csv')
                 print('Export')
             except:
                 print('Error')

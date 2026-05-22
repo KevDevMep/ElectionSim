@@ -22,6 +22,10 @@ def toForm(tag: str, floor: float):
     prev = dfB.loc[index[0], 'CD']
     for i in index:
         if dfB.loc[i, 'CD'] != prev:
+            if district.get('REPUBLICAN', 0) == 0:
+                district['REPUBLICAN'] = 0
+            if district.get('DEMOCRAT', 0) == 0:
+                district['DEMOCRAT'] = 0
             data[prev] = district
             prev = dfB.loc[i, 'CD']
             district = {}
@@ -52,9 +56,10 @@ def toFormB(tag: str):
     dataDF.to_csv(f'{tag}_NY.csv')
 
 def setUp(df_: pd.DataFrame, year: int):
-    df_ = df_[(df_['year'] == year) & (df_['state_po'] != 'DC')].drop(columns=['state', 'state_fips', 'state_cen', 'state_ic', 'office', 'stage', 'runoff', 'special', 'writein', 'mode', 'unofficial', 'version', 'fusion_ticket']).dropna()
+    df_ = df_[(df_['year'] == year) & (df_['state_po'] != 'DC')].dropna()
     df_ = setCD(df_)
     df_['Pct'] = (df_['candidatevotes'] / abs(df_['totalvotes'])) * 100
+    df_ = df_[['state_po', 'CD', 'candidate', 'party', 'Pct']]
     return df_
 
 def merge():
