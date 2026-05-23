@@ -11,6 +11,7 @@ def load():
             B.gdf = gp.read_file(filename.get().strip(), use_arrow=True)
             B.loading()
         else:
+            A.data = []
             A.load(filename.get().strip())
         loaded.set(True)
         print('Loading Succesful')

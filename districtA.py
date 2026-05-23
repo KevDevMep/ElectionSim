@@ -14,10 +14,13 @@ def expectedValue():
 
 def load(file:str):
     with open(file, newline='') as csvfile:
-        districtreader = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+        districtreader = csv.DictReader(csvfile)
         i = 0
         for row in districtreader:
-            d = District.District(i + 1, float(row['DemPct']),float(row['RepPct']) , float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+            if row['id'].isnumeric():
+                d = District.District(i + 1, float(row['DemPct']),float(row['RepPct']) , float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
+            else:
+                d = District.District(row['id'], float(row['DemPct']),float(row['RepPct']) , float(row['WhitePct']), float(row['MinorityPct']), float(row['BlackPct']), float(row['HispanicPct']), float(row['PacificPct']), float(row['AsianPct']), float(row['NativePct']))
             d.reset()
             d.expected(safe_point)
             d.majority()
