@@ -4,6 +4,14 @@ df = pd.DataFrame()
 m1 = pd.DataFrame()
 m2 = pd.DataFrame()
 
+def party(df: pd.DataFrame, i: int, district: dict):
+    if df.loc[i, 'party'] == 'REPUBLICAN':
+            district['REPUBLICAN'] = max(district.get('REPUBLICAN', 0), df.loc[i, 'Pct'])
+    elif df.loc[i, 'party'] in ['DEMOCRAT', 'DEMOCRATIC-FARMER-LABOR', 'DEMOCRATIC-NONPARTISAN LEAGUE']:
+        district['DEMOCRAT'] = max(district.get('DEMOCRAT', 0), df.loc[i, 'Pct'])
+    else:
+        district['OTHER'] = max(district.get('OTHER', 0), df.loc[i, 'Pct'])
+
 def setCD(df_: pd.DataFrame):
     index = df_.index
     for i in index:
@@ -29,9 +37,15 @@ def toForm(tag: str, floor: float):
             data[prev] = district
             prev = dfB.loc[i, 'CD']
             district = {}
-            district[dfB.loc[i, 'party']] = dfB.loc[i, 'Pct']
+            # if dfB.loc[i, 'party'] == 'REPUBLICAN':
+            #     district['REPUBLICAN'] = max(district.get('REPUBLICAN', 0), dfB.loc[i, 'Pct'])
+            # elif dfB.loc[i, 'party'] in ['DEMOCRAT', 'DEMOCRATIC-FARMER-LABOR', 'DEMOCRATIC-NONPARTISAN LEAGUE']:
+            #     district['DEMOCRAT'] = max(district.get('DEMOCRAT', 0), dfB.loc[i, 'Pct'])
+            # else:
+            #     district['OTHER'] = max(district.get('OTHER', 0), dfB.loc[i, 'Pct'])
+            party(dfB, i, district)
         else:
-            district[dfB.loc[i, 'party']] = max(dfB.loc[i, 'Pct'], district.get(dfB.loc[i, 'party'], 0))
+            party(dfB, i, district)
     data[prev] = district
 
     dataDF = pd.DataFrame(data)
@@ -56,10 +70,11 @@ def toFormB(tag: str):
     dataDF.to_csv(f'{tag}_NY.csv')
 
 def setUp(df_: pd.DataFrame, year: int):
-    df_ = df_[(df_['year'] == year) & (df_['state_po'] != 'DC')].dropna()
+    df_ = df_[(df_['year'] == year) & (df_['state_po'] != 'DC')]
     df_ = setCD(df_)
     df_['Pct'] = (df_['candidatevotes'] / abs(df_['totalvotes'])) * 100
     df_ = df_[['state_po', 'CD', 'candidate', 'party', 'Pct']]
+    df_ = df_.dropna()
     return df_
 
 def merge():

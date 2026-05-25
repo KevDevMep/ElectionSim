@@ -32,11 +32,8 @@ def geoMerge():
         merged['Margin'] = merged['DemPct'] - merged['RepPct']
         merged['Margin2'] = merged['DemPct2'] - merged['RepPct2']
         merged['Swing'] = merged['Margin'] - merged['Margin2']
-        merged['R_Margin'] = merged['Margin'] - merged['Margin'].mean()
-        merged['R_Margin2'] = merged['Margin2'] - merged['Margin2'].mean()
-        merged['R_Swing'] = merged['Swing'] - merged['Swing'].mean()
         majority(merged)
-        merged.to_file(f'{tag.get()}_Merged.geojson', use_arrow=True, driver='GeoJson')
+        merged.to_file(f'{tag.get()}_Merged.gpkg', use_arrow=True, driver='GPKG')
         print('Success')
     except:
         print('Error')

@@ -108,6 +108,10 @@ def preset():
             filename.set('Election Data 06.csv')
             senBefore.set(27)
             govBefore.set(7)
+        case '2004':
+            filename.set('Election Data 04.csv')
+            senBefore.set(30)
+            govBefore.set(16)
         case _:
             print('Not a year with a preset')
 
