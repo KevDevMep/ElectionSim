@@ -112,12 +112,16 @@ def preset():
             filename.set('Election Data 04.csv')
             senBefore.set(30)
             govBefore.set(16)
+        case '2002':
+            filename.set('Election Data 02.csv')
+            senBefore.set(37)
+            govBefore.set(10)
         case _:
             print('Not a year with a preset')
 
 def comp():
     if loaded.get():
-        S.comp()
+        S.comp(cutOff.get())
     else:
         print('File not loaded')
 
@@ -137,6 +141,7 @@ shift = tk.IntVar()
 senBefore = tk.IntVar()
 govBefore = tk.IntVar()
 senTarget = tk.IntVar(value=50)
+cutOff = tk.IntVar(value=5)
 
 tk.Label(root, text='Filename').grid(row=0, column=0)
 tk.Entry(root, textvariable=filename).grid(row=1, column=0)
@@ -152,7 +157,6 @@ tk.Spinbox(root, textvariable=senBefore, from_=0, to_=100).grid(row=6, column=0)
 tk.Spinbox(root, textvariable=govBefore, from_=0, to_=50).grid(row=6, column=1)
 tk.Checkbutton(root, variable=loaded, text='Loaded', onvalue=True, offvalue=False, state='disabled').grid(row=7, column=0)
 
-
 tk.Button(root, text='President', command=pres).grid(row=0, column=3)
 tk.Button(root, text='House', command=house).grid(row=1, column=3)
 tk.Button(root, text='Senate', command=senate).grid(row=2, column=3)
@@ -165,9 +169,11 @@ tk.Button(root, text='Target', command=senGoTo).grid(row=7, column=3)
 tk.Label(root, text='Year').grid(row=0, column=4)
 tk.Entry(root, textvariable=year).grid(row=1, column=4)
 tk.Button(root, text='Historical Preset', command=preset).grid(row=2, column=4)
-tk.Button(root, text='Comp', command=comp).grid(row=3, column=4)
-tk.Label(root, text='Name').grid(row=4, column=4)
-tk.Entry(root, textvariable=name).grid(row=5, column=4)
-tk.Button(root, text='Search',command=search).grid(row=6, column=4)
+tk.Label(root, text='Cuttoff').grid(row=3, column=4)
+tk.Spinbox(root, textvariable=cutOff, from_=0, to=100).grid(row=4, column=4)
+tk.Button(root, text='Comp', command=comp).grid(row=5, column=4)
+tk.Label(root, text='Name').grid(row=6, column=4)
+tk.Entry(root, textvariable=name).grid(row=7, column=4)
+tk.Button(root, text='Search',command=search).grid(row=8, column=4)
 
 root.mainloop()

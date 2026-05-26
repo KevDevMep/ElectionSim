@@ -74,23 +74,23 @@ def senGoTo(senBefore: int, target: int=50):
                 print(dem.iloc[i])
                 demEV -= 1
 
-def comp():
+def comp(cutOff: float):
     pres = df[df['Type']=='Pres']
     if len(pres) != 0:
         print('Pres:')
-        print(pres[abs(pres['Margin']) < 5].sort_values(by=['Margin']))
+        print(pres[abs(pres['Margin']) < cutOff].sort_values(by=['Margin']))
 
     sen = df[df['Type']=='Senate']
     if len(sen) != 0:
         print('Senate:')
-        print(sen[abs(sen['Margin']) < 5].sort_values(by=['Margin']))
+        print(sen[abs(sen['Margin']) < cutOff].sort_values(by=['Margin']))
 
     house = df[df['Type']=='House']
     if len(house) != 0:
         print('House:')
-        print(house[abs(house['Margin']) < 5].sort_values(by=['Margin']))
+        print(house[abs(house['Margin']) < cutOff].sort_values(by=['Margin']))
     
     gov = df[df['Type']=='Gov']
     if len(gov) != 0:
         print('Gov:')
-        print(gov[abs(gov['Margin']) < 5].sort_values(by=['Margin']))
+        print(gov[abs(gov['Margin']) < cutOff].sort_values(by=['Margin']))

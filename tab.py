@@ -7,7 +7,7 @@ m2 = pd.DataFrame()
 def party(df: pd.DataFrame, i: int, district: dict):
     if df.loc[i, 'party'] == 'REPUBLICAN':
             district['REPUBLICAN'] = max(district.get('REPUBLICAN', 0), df.loc[i, 'Pct'])
-    elif df.loc[i, 'party'] in ['DEMOCRAT', 'DEMOCRATIC-FARMER-LABOR', 'DEMOCRATIC-NONPARTISAN LEAGUE']:
+    elif df.loc[i, 'party'] in ['DEMOCRAT', 'DEMOCRATIC-FARMER-LABOR', 'DEMOCRATIC-NONPARTISAN LEAGUE', 'GREEN']:
         district['DEMOCRAT'] = max(district.get('DEMOCRAT', 0), df.loc[i, 'Pct'])
     else:
         district['OTHER'] = max(district.get('OTHER', 0), df.loc[i, 'Pct'])
@@ -37,12 +37,6 @@ def toForm(tag: str, floor: float):
             data[prev] = district
             prev = dfB.loc[i, 'CD']
             district = {}
-            # if dfB.loc[i, 'party'] == 'REPUBLICAN':
-            #     district['REPUBLICAN'] = max(district.get('REPUBLICAN', 0), dfB.loc[i, 'Pct'])
-            # elif dfB.loc[i, 'party'] in ['DEMOCRAT', 'DEMOCRATIC-FARMER-LABOR', 'DEMOCRATIC-NONPARTISAN LEAGUE']:
-            #     district['DEMOCRAT'] = max(district.get('DEMOCRAT', 0), dfB.loc[i, 'Pct'])
-            # else:
-            #     district['OTHER'] = max(district.get('OTHER', 0), dfB.loc[i, 'Pct'])
             party(dfB, i, district)
         else:
             party(dfB, i, district)
