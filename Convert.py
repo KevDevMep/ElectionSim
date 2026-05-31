@@ -16,7 +16,7 @@ def export(type_: str, tag: str):
             gdf.drop(columns=['geometry']).to_json(f'{tag}.json')
         case 'HTML':
             gdf.drop(columns=['geometry']).to_html(f'{tag}.html')
-    print('Exported')
+    print(f'Exported {tag}.{type_}')
 
 def majority():
     gdf['Majority'] = ''

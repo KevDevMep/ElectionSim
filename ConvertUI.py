@@ -7,7 +7,7 @@ def load():
         try:
             C.gdf = gp.read_file(fileName.get().strip())
             loaded.set(True)
-            print('Loaded')
+            print(f'{fileName.get().strip()} Loaded')
         except:
             print('Loading Error')
     else:
@@ -15,7 +15,7 @@ def load():
 
 def convert():
     if loaded.get():
-        if (tag.get().strip() != '') or (type_.get().strip()):
+        if (tag.get().strip() != '') and (type_.get().strip()):
             C.export(type_.get().strip(), tag.get().strip())
         else:
             print('Tag/Type can not be empty')
@@ -37,7 +37,7 @@ def drop():
         if col.get().strip() != '':
             try:
                 C.gdf = C.gdf.drop(columns=[col.get().strip()])
-                print('Dropped')
+                print(f'{col.get().strip()} Dropped')
             except:
                 print('Error')
         else:
